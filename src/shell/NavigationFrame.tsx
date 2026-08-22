@@ -9,6 +9,7 @@ export function NavigationFrame(): JSX.Element {
     <div
       style={{
         width: 'var(--frame-width)',
+        boxSizing: 'border-box', // paddingRight must not add to the fixed 288px frame width
         display: 'flex',
         flexDirection: 'column',
         gap: 'var(--space-4)',

@@ -80,8 +80,12 @@ function checkNoRawPxOutsideTokens(): void {
     for (const line of content.split('\n')) {
       const trimmed = line.trim();
       if (trimmed.startsWith('/*') || trimmed.startsWith('*')) continue;
+      // Strip a trailing inline comment before checking for px literals —
+      // a px value mentioned in prose (e.g. explaining a bug) is not a
+      // style declaration.
+      const codeOnly = trimmed.replace(/\/\*.*?\*\//g, '').trim();
       if (exemptPatterns.some((p) => p.test(trimmed))) continue;
-      const matches = trimmed.match(pxPattern);
+      const matches = codeOnly.match(pxPattern);
       if (matches) offenders.push(`${f.replace(ROOT + '/', '')}: "${trimmed}"`);
     }
   }

@@ -50,6 +50,7 @@
 }
 
 .element-tile {
+  box-sizing: border-box; /* padding + border must not add to the fixed 140px tile-band height (§L.4.5's 34px slack, entirely consumed without this) */
   height: 100%;
   border: 1px solid var(--surface-edge);
   border-radius: 4px;

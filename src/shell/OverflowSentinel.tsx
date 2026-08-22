@@ -40,21 +40,32 @@ export function OverflowSentinel(): JSX.Element | null {
   useEffect(() => {
     if (!active) return;
     let cancelled = false;
-    // Wait for the actual web font, not just a paint frame. fcc-tokens.css
-    // deliberately uses font-display: block, so text is measured against a
-    // FALLBACK font's metrics until Inter finishes loading and swaps in —
-    // scanning before that point measures the wrong font entirely, which
-    // produces exactly the false positives found here (identical-length
-    // strings getting different verdicts, short strings with no visible
-    // ellipsis still flagged). document.fonts.ready resolves once the real
-    // font is available; only then is scrollWidth/clientWidth trustworthy.
-    document.fonts.ready
-      .then(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())))
-      .then(() => {
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
+    // A single scan, however carefully timed, is a race — document.fonts
+    // .ready resolving doesn't guarantee the LAST layout-affecting reflow
+    // has already happened (confirmed live, 22 Aug 2026: elements measured
+    // as genuinely fitting via DevTools moments after load were still
+    // being reported as overruns by a scan that had run too early and
+    // never re-checked). Rather than guess at a longer fixed delay — which
+    // just relocates the same race rather than removing it — scan
+    // repeatedly over a settling window and keep only the last result,
+    // which reflects whatever the page has actually settled into.
+    const schedule = (delayMs: number) => {
+      const t = setTimeout(() => {
         if (!cancelled) setResult(scanForOverruns());
-      });
+      }, delayMs);
+      timers.push(t);
+    };
+
+    document.fonts.ready.then(() => {
+      if (cancelled) return;
+      [0, 150, 400, 800, 1500].forEach(schedule);
+    });
+
     return () => {
       cancelled = true;
+      timers.forEach(clearTimeout);
     };
   }, [active, horizon]);
 

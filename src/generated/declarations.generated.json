@@ -1480,7 +1480,7 @@
       "status": "inactive",
       "placement": {
         "band": "program-elements",
-        "group": "Governance and Reporting",
+        "group": "Data, models and records",
         "order": 23
       },
       "content": {

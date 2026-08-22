@@ -52,6 +52,7 @@
 .element-tile {
   box-sizing: border-box; /* padding + border must not add to the fixed 140px tile-band height (§L.4.5's 34px slack, entirely consumed without this) */
   height: 100%;
+  overflow: hidden; /* clip locally rather than spill into the band label above or the register field below — content that doesn't fit should fail visibly and in place */
   border: 1px solid var(--surface-edge);
   border-radius: 4px;
   padding: var(--space-3);
@@ -115,6 +116,7 @@
   align-items: start;
   column-gap: var(--space-2);
   height: var(--register-row-height);
+  overflow: hidden; /* same defensive clip as .element-tile — fail locally, not by spilling into the next row */
   padding: 6px var(--space-2); /* BUDGET — 6+6 exact per §L.4.5's row-height arithmetic (25+20+6+6=57), not a spacing-scale choice */
   border: 1px solid var(--surface-edge);
   border-radius: 4px;

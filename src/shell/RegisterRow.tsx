@@ -8,7 +8,15 @@ export function RegisterRow({ content }: { content: ElementContent }): JSX.Eleme
   const trend = content.trend.kind === 'authored' ? content.trend.value : null;
   const health = content.health.kind === 'authored' ? content.health.value : null;
 
-  const line2 = [content.metricHeader, content.feedCaption].filter(Boolean).join(' · ');
+  // Source (feed caption) first, metric description last. Line 2 is a
+  // single left-aligned string spanning under both the title and hero
+  // columns, so whichever piece sits at the END of the string lands
+  // visually under the hero number — and the hero's own description (the
+  // metric header) belongs there, not the source attribution. Fixed from
+  // a live screenshot, 22 Aug 2026 (Chris): the hero was reading as
+  // paired with the source ("KYC system") rather than with what it
+  // actually measures ("% Past Due KYC Refresh").
+  const line2 = [content.feedCaption, content.metricHeader].filter(Boolean).join(' · ');
 
   return (
     <div className="register-row" data-status="inactive">

@@ -5,8 +5,19 @@
 .canvas-viewport {
   position: fixed;
   inset: 0;
-  display: grid;
-  place-items: center;
+  /* Flexbox, not Grid: a single oversized child (canvas-root is fixed at
+     1920x1080, larger than any real screen) is centered correctly by
+     align-items/justify-content on a flex container. Grid's place-items
+     only centers a child WITHIN its track, and an auto-sized grid track
+     grows to fit an oversized child exactly, leaving no room to center
+     within — the child then anchors to the container's top-left by
+     default, and scale()'s own-center transform-origin then shrinks it
+     toward that off-center point, pulling all visible content toward the
+     bottom-right with dead space at top-left. Caught from a live
+     screenshot, 22 Aug 2026 (Chris). */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   background: var(--ground);
 }

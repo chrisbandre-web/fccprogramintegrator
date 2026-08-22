@@ -1,0 +1,1674 @@
+{
+  "_generated": "GENERATED — DO NOT EDIT. Produced by scripts/generate-declarations.ts from the three Appendix B workbooks in content/. A content change is a workbook edit followed by a regeneration, in that order (TAD §D.1.1).",
+  "declarations": [
+    {
+      "id": "customers",
+      "status": "live",
+      "placement": {
+        "band": "business-risk",
+        "group": null,
+        "order": 0
+      },
+      "content": {
+        "month": {
+          "title": "Customers",
+          "metricHeader": "% New Customers High Risk",
+          "hero": {
+            "kind": "computed"
+          },
+          "trend": {
+            "kind": "computed"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Red"
+          },
+          "feedCaption": "native - customer intake"
+        },
+        "quarter": {
+          "title": "Customers",
+          "metricHeader": "% New Customers High Risk",
+          "hero": {
+            "kind": "computed"
+          },
+          "trend": {
+            "kind": "computed"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Amber"
+          },
+          "feedCaption": "native - customer intake"
+        },
+        "year": {
+          "title": "Customers",
+          "metricHeader": "% New Customers High Risk",
+          "hero": {
+            "kind": "computed"
+          },
+          "trend": {
+            "kind": "computed"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "native - customer intake"
+        }
+      }
+    },
+    {
+      "id": "transactions",
+      "status": "inactive",
+      "placement": {
+        "band": "business-risk",
+        "group": null,
+        "order": 1
+      },
+      "content": {
+        "month": {
+          "title": "Transactions",
+          "metricHeader": "% Trx High-risk Jurisdiction",
+          "hero": {
+            "kind": "authored",
+            "value": 0.8,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "native - Core banking system"
+        },
+        "quarter": {
+          "title": "Transactions",
+          "metricHeader": "% Trx High-risk Jurisdiction",
+          "hero": {
+            "kind": "authored",
+            "value": 0.7,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "native - Core banking system"
+        },
+        "year": {
+          "title": "Transactions",
+          "metricHeader": "% Trx High-risk Jurisdiction",
+          "hero": {
+            "kind": "authored",
+            "value": 0.6,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "native - Core banking system"
+        }
+      }
+    },
+    {
+      "id": "ewra",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Risk Assessments",
+        "order": 2
+      },
+      "content": {
+        "month": {
+          "title": "EWRA",
+          "metricHeader": "Days until Board reporting",
+          "hero": {
+            "kind": "authored",
+            "value": 42,
+            "unit": "Days"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Increasing"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Amber"
+          },
+          "feedCaption": "Risk assessment Lead"
+        },
+        "quarter": {
+          "title": "EWRA",
+          "metricHeader": "Days until Board reporting",
+          "hero": {
+            "kind": "authored",
+            "value": 132,
+            "unit": "Days"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Risk assessment Lead"
+        },
+        "year": {
+          "title": "EWRA",
+          "metricHeader": "Days until Board reporting",
+          "hero": {
+            "kind": "authored",
+            "value": 360,
+            "unit": "Days"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Risk assessment Lead"
+        }
+      }
+    },
+    {
+      "id": "emerging-risk",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Risk Assessments",
+        "order": 3
+      },
+      "content": {
+        "month": {
+          "title": "Emerging Risk",
+          "metricHeader": null,
+          "hero": {
+            "kind": "absent"
+          },
+          "trend": {
+            "kind": "absent"
+          },
+          "health": {
+            "kind": "absent"
+          },
+          "feedCaption": "Risk assessment Lead"
+        },
+        "quarter": {
+          "title": "Emerging Risk",
+          "metricHeader": null,
+          "hero": {
+            "kind": "absent"
+          },
+          "trend": {
+            "kind": "absent"
+          },
+          "health": {
+            "kind": "absent"
+          },
+          "feedCaption": "Risk assessment Lead"
+        },
+        "year": {
+          "title": "Emerging Risk",
+          "metricHeader": null,
+          "hero": {
+            "kind": "absent"
+          },
+          "trend": {
+            "kind": "absent"
+          },
+          "health": {
+            "kind": "absent"
+          },
+          "feedCaption": "Risk assessment Lead"
+        }
+      }
+    },
+    {
+      "id": "kyc",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Core pillars",
+        "order": 4
+      },
+      "content": {
+        "month": {
+          "title": "KYC",
+          "metricHeader": "% Past Due KYC Refresh",
+          "hero": {
+            "kind": "authored",
+            "value": 2.6,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Increasing"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Amber"
+          },
+          "feedCaption": "KYC system"
+        },
+        "quarter": {
+          "title": "KYC",
+          "metricHeader": "% Past Due KYC Refresh",
+          "hero": {
+            "kind": "authored",
+            "value": 1.4,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Increasing"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Amber"
+          },
+          "feedCaption": "KYC system"
+        },
+        "year": {
+          "title": "KYC",
+          "metricHeader": "% Past Due KYC Refresh",
+          "hero": {
+            "kind": "authored",
+            "value": 0.2,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "KYC system"
+        }
+      }
+    },
+    {
+      "id": "edd",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Core pillars",
+        "order": 5
+      },
+      "content": {
+        "month": {
+          "title": "EDD",
+          "metricHeader": "% Past Due EDD Refresh",
+          "hero": {
+            "kind": "authored",
+            "value": 3.2,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Increasing"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Amber"
+          },
+          "feedCaption": "KYC system"
+        },
+        "quarter": {
+          "title": "EDD",
+          "metricHeader": "% Past Due EDD Refresh",
+          "hero": {
+            "kind": "authored",
+            "value": 2.2,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Increasing"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Amber"
+          },
+          "feedCaption": "KYC system"
+        },
+        "year": {
+          "title": "EDD",
+          "metricHeader": "% Past Due EDD Refresh",
+          "hero": {
+            "kind": "authored",
+            "value": 0.4,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "KYC system"
+        }
+      }
+    },
+    {
+      "id": "tm",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Core pillars",
+        "order": 6
+      },
+      "content": {
+        "month": {
+          "title": "TM",
+          "metricHeader": "% TM alerts past closure date",
+          "hero": {
+            "kind": "authored",
+            "value": 1.2,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "TM system"
+        },
+        "quarter": {
+          "title": "TM",
+          "metricHeader": "% TM alerts past closure date",
+          "hero": {
+            "kind": "authored",
+            "value": 0.8,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "TM system"
+        },
+        "year": {
+          "title": "TM",
+          "metricHeader": "% TM alerts past closure date",
+          "hero": {
+            "kind": "authored",
+            "value": 0.4,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "TM system"
+        }
+      }
+    },
+    {
+      "id": "investigations",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Core pillars",
+        "order": 7
+      },
+      "content": {
+        "month": {
+          "title": "Investigations",
+          "metricHeader": "# Investigations Overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 4,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Case Mgr."
+        },
+        "quarter": {
+          "title": "Investigations",
+          "metricHeader": "# Investigations Overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 2,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Case Mgr."
+        },
+        "year": {
+          "title": "Investigations",
+          "metricHeader": "# Investigations Overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Case Mgr."
+        }
+      }
+    },
+    {
+      "id": "regulatory-reporting",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Core pillars",
+        "order": 8
+      },
+      "content": {
+        "month": {
+          "title": "Regulatory Reporting",
+          "metricHeader": "# Regulatory Reports Overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 2,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Increasing"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Amber"
+          },
+          "feedCaption": "Case Mgr."
+        },
+        "quarter": {
+          "title": "Regulatory Reporting",
+          "metricHeader": "# Regulatory Reports Overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Case Mgr."
+        },
+        "year": {
+          "title": "Regulatory Reporting",
+          "metricHeader": "# Regulatory Reports Overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Case Mgr."
+        }
+      }
+    },
+    {
+      "id": "sanctions-program",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "FCC Programs",
+        "order": 9
+      },
+      "content": {
+        "month": {
+          "title": "Sanctions Program",
+          "metricHeader": "# sanctions breaches",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Sanctions Team"
+        },
+        "quarter": {
+          "title": "Sanctions Program",
+          "metricHeader": "# sanctions breaches",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Sanctions Team"
+        },
+        "year": {
+          "title": "Sanctions Program",
+          "metricHeader": "# sanctions breaches",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Sanctions Team"
+        }
+      }
+    },
+    {
+      "id": "abc-program",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "FCC Programs",
+        "order": 10
+      },
+      "content": {
+        "month": {
+          "title": "ABC Program",
+          "metricHeader": "# ABC policy breaches",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "AML Team"
+        },
+        "quarter": {
+          "title": "ABC Program",
+          "metricHeader": "# ABC policy breaches",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "AML Team"
+        },
+        "year": {
+          "title": "ABC Program",
+          "metricHeader": "# ABC policy breaches",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "AML Team"
+        }
+      }
+    },
+    {
+      "id": "screening",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Program infrastructure",
+        "order": 11
+      },
+      "content": {
+        "month": {
+          "title": "Screening",
+          "metricHeader": "% Alerts Overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 2.6,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Increasing"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Amber"
+          },
+          "feedCaption": "Screening system"
+        },
+        "quarter": {
+          "title": "Screening",
+          "metricHeader": "% Alerts Overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 1.8,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Increasing"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Amber"
+          },
+          "feedCaption": "Screening system"
+        },
+        "year": {
+          "title": "Screening",
+          "metricHeader": "% Alerts Overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 0.4,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Screening system"
+        }
+      }
+    },
+    {
+      "id": "governance",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Program infrastructure",
+        "order": 12
+      },
+      "content": {
+        "month": {
+          "title": "Governance",
+          "metricHeader": "Policy approvals overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 2,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Increasing"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Amber"
+          },
+          "feedCaption": "Governance Lead"
+        },
+        "quarter": {
+          "title": "Governance",
+          "metricHeader": "Policy approvals overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Governance Lead"
+        },
+        "year": {
+          "title": "Governance",
+          "metricHeader": "Policy approvals overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Governance Lead"
+        }
+      }
+    },
+    {
+      "id": "staffing",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Program infrastructure",
+        "order": 13
+      },
+      "content": {
+        "month": {
+          "title": "Staffing",
+          "metricHeader": "% staff unfilled",
+          "hero": {
+            "kind": "authored",
+            "value": 12,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Increasing"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Red"
+          },
+          "feedCaption": "Staffing assessment"
+        },
+        "quarter": {
+          "title": "Staffing",
+          "metricHeader": "% staff unfilled",
+          "hero": {
+            "kind": "authored",
+            "value": 6,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Increasing"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Amber"
+          },
+          "feedCaption": "Staffing assessment"
+        },
+        "year": {
+          "title": "Staffing",
+          "metricHeader": "% staff unfilled",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Staffing assessment"
+        }
+      }
+    },
+    {
+      "id": "training",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Program infrastructure",
+        "order": 14
+      },
+      "content": {
+        "month": {
+          "title": "Training",
+          "metricHeader": "% FCC training overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 4,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Training Lead"
+        },
+        "quarter": {
+          "title": "Training",
+          "metricHeader": "% FCC training overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 2,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Training Lead"
+        },
+        "year": {
+          "title": "Training",
+          "metricHeader": "% FCC training overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 0.6,
+            "unit": "%"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Training Lead"
+        }
+      }
+    },
+    {
+      "id": "qa",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Program infrastructure",
+        "order": 15
+      },
+      "content": {
+        "month": {
+          "title": "QA",
+          "metricHeader": "# QA tests overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 4,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Increasing"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Amber"
+          },
+          "feedCaption": "QA Lead"
+        },
+        "quarter": {
+          "title": "QA",
+          "metricHeader": "# QA tests overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 2,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Increasing"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Amber"
+          },
+          "feedCaption": "QA Lead"
+        },
+        "year": {
+          "title": "QA",
+          "metricHeader": "# QA tests overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 1,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "QA Lead"
+        }
+      }
+    },
+    {
+      "id": "exam-audit-mgmt",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Program infrastructure",
+        "order": 16
+      },
+      "content": {
+        "month": {
+          "title": "Exam / Audit Mgmt.",
+          "metricHeader": "# recent Audit and Exam Findings",
+          "hero": {
+            "kind": "authored",
+            "value": 2,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Increasing"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Amber"
+          },
+          "feedCaption": "External review Lead"
+        },
+        "quarter": {
+          "title": "Exam / Audit Mgmt.",
+          "metricHeader": "# recent Audit and Exam Findings",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "External review Lead"
+        },
+        "year": {
+          "title": "Exam / Audit Mgmt.",
+          "metricHeader": "# recent Audit and Exam Findings",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "External review Lead"
+        }
+      }
+    },
+    {
+      "id": "issue-mgmt",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Program infrastructure",
+        "order": 17
+      },
+      "content": {
+        "month": {
+          "title": "Issue Mgmt.",
+          "metricHeader": "# issues overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 18,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Increasing"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Red"
+          },
+          "feedCaption": "IMR Lead"
+        },
+        "quarter": {
+          "title": "Issue Mgmt.",
+          "metricHeader": "# issues overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 12,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Increasing"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Amber"
+          },
+          "feedCaption": "IMR Lead"
+        },
+        "year": {
+          "title": "Issue Mgmt.",
+          "metricHeader": "# issues overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 2,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "IMR Lead"
+        }
+      }
+    },
+    {
+      "id": "change-mgmt",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Program infrastructure",
+        "order": 18
+      },
+      "content": {
+        "month": {
+          "title": "Change Mgmt.",
+          "metricHeader": "# FCC program initiatives overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 3,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Planning Lead"
+        },
+        "quarter": {
+          "title": "Change Mgmt.",
+          "metricHeader": "# FCC program initiatives overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 2,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Planning Lead"
+        },
+        "year": {
+          "title": "Change Mgmt.",
+          "metricHeader": "# FCC program initiatives overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Planning Lead"
+        }
+      }
+    },
+    {
+      "id": "data-management",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Data, models and records",
+        "order": 19
+      },
+      "content": {
+        "month": {
+          "title": "Data Management",
+          "metricHeader": "# KDEs requiring remediation",
+          "hero": {
+            "kind": "authored",
+            "value": 18,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Increasing"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Amber"
+          },
+          "feedCaption": "Data Lead"
+        },
+        "quarter": {
+          "title": "Data Management",
+          "metricHeader": "# KDEs requiring remediation",
+          "hero": {
+            "kind": "authored",
+            "value": 11,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Increasing"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Amber"
+          },
+          "feedCaption": "Data Lead"
+        },
+        "year": {
+          "title": "Data Management",
+          "metricHeader": "# KDEs requiring remediation",
+          "hero": {
+            "kind": "authored",
+            "value": 2,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Data Lead"
+        }
+      }
+    },
+    {
+      "id": "models-non-model-tools",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Data, models and records",
+        "order": 20
+      },
+      "content": {
+        "month": {
+          "title": "Models & Non-model Tools",
+          "metricHeader": "# model validations overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 2,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Data Lead"
+        },
+        "quarter": {
+          "title": "Models & Non-model Tools",
+          "metricHeader": "# model validations overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 1,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Data Lead"
+        },
+        "year": {
+          "title": "Models & Non-model Tools",
+          "metricHeader": "# model validations overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 1,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Data Lead"
+        }
+      }
+    },
+    {
+      "id": "information-sharing",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Data, models and records",
+        "order": 21
+      },
+      "content": {
+        "month": {
+          "title": "Information Sharing",
+          "metricHeader": "# information sharing requests overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "AML Team"
+        },
+        "quarter": {
+          "title": "Information Sharing",
+          "metricHeader": "# information sharing requests overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "AML Team"
+        },
+        "year": {
+          "title": "Information Sharing",
+          "metricHeader": "# information sharing requests overdue",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "AML Team"
+        }
+      }
+    },
+    {
+      "id": "recordkeeping",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Data, models and records",
+        "order": 22
+      },
+      "content": {
+        "month": {
+          "title": "Recordkeeping",
+          "metricHeader": "# recordkeeping breaches",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Data Lead"
+        },
+        "quarter": {
+          "title": "Recordkeeping",
+          "metricHeader": "# recordkeeping breaches",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Data Lead"
+        },
+        "year": {
+          "title": "Recordkeeping",
+          "metricHeader": "# recordkeeping breaches",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Data Lead"
+        }
+      }
+    },
+    {
+      "id": "fcc-risk-appetite-statement",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Governance and Reporting",
+        "order": 23
+      },
+      "content": {
+        "month": {
+          "title": "FCC Risk Appetite Statement",
+          "metricHeader": "# risk appetite breaches",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "AML Team"
+        },
+        "quarter": {
+          "title": "FCC Risk Appetite Statement",
+          "metricHeader": "# risk appetite breaches",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "AML Team"
+        },
+        "year": {
+          "title": "FCC Risk Appetite Statement",
+          "metricHeader": "# risk appetite breaches",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "AML Team"
+        }
+      }
+    },
+    {
+      "id": "board-reporting",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Governance and Reporting",
+        "order": 24
+      },
+      "content": {
+        "month": {
+          "title": "Board Reporting",
+          "metricHeader": "# overdue reports",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Reporting Lead"
+        },
+        "quarter": {
+          "title": "Board Reporting",
+          "metricHeader": "# overdue reports",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Reporting Lead"
+        },
+        "year": {
+          "title": "Board Reporting",
+          "metricHeader": "# overdue reports",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Reporting Lead"
+        }
+      }
+    },
+    {
+      "id": "risk-committee-reporting",
+      "status": "inactive",
+      "placement": {
+        "band": "program-elements",
+        "group": "Governance and Reporting",
+        "order": 25
+      },
+      "content": {
+        "month": {
+          "title": "Risk Committee Reporting",
+          "metricHeader": "# overdue reports",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Reporting Lead"
+        },
+        "quarter": {
+          "title": "Risk Committee Reporting",
+          "metricHeader": "# overdue reports",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Reporting Lead"
+        },
+        "year": {
+          "title": "Risk Committee Reporting",
+          "metricHeader": "# overdue reports",
+          "hero": {
+            "kind": "authored",
+            "value": 0,
+            "unit": "count"
+          },
+          "trend": {
+            "kind": "authored",
+            "value": "Stable"
+          },
+          "health": {
+            "kind": "authored",
+            "value": "Green"
+          },
+          "feedCaption": "Reporting Lead"
+        }
+      }
+    }
+  ]
+}

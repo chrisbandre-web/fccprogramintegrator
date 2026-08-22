@@ -1,0 +1,17 @@
+{
+  "generatedAt": "2026-08-22T17:23:16.130Z",
+  "workbooks": {
+    "month": {
+      "filename": "Tile_Content_Appendix_B_MONTH_21AUG26.xlsx",
+      "sha256": "9608a20f8cf20a132e0a48dcb1697a0eed76d0b9604206ebc7daad05b4e79114"
+    },
+    "quarter": {
+      "filename": "Tile_Content_Appendix_B_QUARTER_21AUG26.xlsx",
+      "sha256": "c4052622ecfe9c73f3a4aedea08a5c2e138d40a9545c331b5a087fb6278273e7"
+    },
+    "year": {
+      "filename": "Tile_Content_Appendix_B_YEAR_21AUG26.xlsx",
+      "sha256": "3210c79eb841bb1e48acb13eb2423c42cb77807d591b9f5f408cf0791dfceeef"
+    }
+  }
+}

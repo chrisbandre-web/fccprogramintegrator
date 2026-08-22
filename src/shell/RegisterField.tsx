@@ -43,7 +43,7 @@ export function RegisterField({
       {rows.map(({ row, freshGroup }, i) => (
         <div className="register-field__row" data-fresh-group={freshGroup} key={i}>
           {row.map((d) => (
-            <RegisterRow key={d.id} content={d.content[horizon]} />
+            <RegisterRow key={d.id} id={d.id} content={d.content[horizon]} />
           ))}
         </div>
       ))}

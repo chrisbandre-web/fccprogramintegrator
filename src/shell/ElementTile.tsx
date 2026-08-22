@@ -17,11 +17,13 @@ function resolveTrend(slot: TrendSlot, horizon: 'month' | 'quarter' | 'year') {
 }
 
 export function ElementTile({
+  id,
   content,
   horizon,
   status,
   onActivate,
 }: {
+  id: string;
   content: ElementContent;
   horizon: 'month' | 'quarter' | 'year';
   status: 'live' | 'inactive';
@@ -45,13 +47,15 @@ export function ElementTile({
     }
   };
 
+  const truncate = { whiteSpace: 'nowrap' as const, overflow: 'hidden' as const, textOverflow: 'ellipsis' as const };
+
   const inner = (
     <>
-      <span style={{ font: 'var(--weight-semibold) var(--type-tile-title) / var(--leading-tight) var(--font-family)', color: 'var(--ink-primary)' }}>
+      <span style={{ font: 'var(--weight-semibold) var(--type-tile-title) / var(--leading-tight) var(--font-family)', color: 'var(--ink-primary)', ...truncate }}>
         {content.title}
       </span>
       {content.metricHeader && (
-        <span style={{ font: 'var(--weight-regular) var(--type-metric-header) / var(--leading-tight) var(--font-family)', color: bodyInk }}>
+        <span style={{ font: 'var(--weight-regular) var(--type-metric-header) / var(--leading-tight) var(--font-family)', color: bodyInk, ...truncate }}>
           {content.metricHeader}
         </span>
       )}
@@ -60,7 +64,7 @@ export function ElementTile({
         {trend && <TrendGlyph value={trend} />}
         {health && <HealthMark value={health} />}
       </div>
-      <span style={{ font: 'var(--weight-regular) var(--type-caption) / var(--leading-tight) var(--font-family)', color: bodyInk }}>
+      <span style={{ font: 'var(--weight-regular) var(--type-caption) / var(--leading-tight) var(--font-family)', color: bodyInk, ...truncate }}>
         {content.feedCaption}
       </span>
     </>
@@ -70,6 +74,7 @@ export function ElementTile({
     <div
       className={`element-tile${status === 'live' ? ' scrim' : ''}`}
       data-status={status}
+      data-element-id={id}
       role={interactive ? 'button' : undefined}
       tabIndex={interactive ? 0 : undefined}
       onClick={interactive ? onActivate : undefined}

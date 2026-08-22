@@ -135,6 +135,9 @@
   grid-row: 1;
   font: var(--weight-semibold) var(--type-register-title) / var(--leading-tight) var(--font-family);
   color: var(--ink-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Source (feed caption) — left-aligned under the title, row 2. */

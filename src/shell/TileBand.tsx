@@ -16,8 +16,8 @@ export function TileBand({
       {declarations.map((d) => {
         const tileProps =
           d.status === 'live'
-            ? { content: d.content[horizon], horizon, status: d.status, onActivate: () => onActivate(d.id) }
-            : { content: d.content[horizon], horizon, status: d.status };
+            ? { id: d.id, content: d.content[horizon], horizon, status: d.status, onActivate: () => onActivate(d.id) }
+            : { id: d.id, content: d.content[horizon], horizon, status: d.status };
         return <ElementTile key={d.id} {...tileProps} />;
       })}
     </div>

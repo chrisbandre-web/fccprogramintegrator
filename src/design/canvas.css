@@ -23,6 +23,7 @@
 }
 
 .canvas-root {
+  position: relative; /* anchors OverflowSentinel's absolute status line */
   width: var(--canvas-width);
   height: var(--canvas-height);
   overflow: hidden; /* the structural guarantee */

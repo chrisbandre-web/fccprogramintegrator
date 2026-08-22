@@ -1,0 +1,176 @@
+/* TAD §D.7.2 — elements.css holds the scrim class, the register grid
+   template and the tile arrangement, all expressed in tokens.
+
+   --register-title-width does not yet exist in fcc-tokens.css (TAD §F.10,
+   §F.25, §L.1). It is requested as a Touch Two addition and carried here,
+   provisionally, at 232 canvas, until the Design System owner confirms it
+   at the phase 1 exit — at which point it moves into tokens.css and this
+   local declaration is deleted. It is declared here rather than inline in
+   a component so there is exactly one place to change when it is confirmed. */
+:root {
+  --register-title-width: 232px; /* PROVISIONAL — see note above */
+}
+
+/* ---------------------------------------------------------------------------
+   ScrimLayer (§D.5.22) — the one place the scrim exists.
+   Binding rule: metric header and caption set to PRIMARY ink through the
+   scrim (secondary fails AA at 3.75:1). Enforced here, in the one class,
+   rather than trusted to 24 call sites.
+   --------------------------------------------------------------------------- */
+.scrim {
+  position: relative;
+  color: var(--ink-primary);
+  transition: background-color var(--motion-state);
+}
+
+.scrim::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--scrim);
+  pointer-events: none;
+}
+
+.scrim > * {
+  position: relative;
+}
+
+/* ---------------------------------------------------------------------------
+   The tile band (§D.5.15) — two tiles, side by side, at the strongest
+   position, in the 140-canvas Business Risk band.
+   --------------------------------------------------------------------------- */
+.tile-band {
+  display: flex;
+  gap: var(--tile-gap);
+  height: var(--tile-band-height);
+}
+
+.tile-band > * {
+  flex: 1 1 0;
+}
+
+.element-tile {
+  height: 100%;
+  border: 1px solid var(--surface-edge);
+  border-radius: 4px;
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-1);
+}
+
+.element-tile[data-status='live'] {
+  background: var(--live-fill);
+  border-color: var(--live-fill-edge);
+  color: var(--ink-primary);
+}
+
+.element-tile[data-status='inactive'] {
+  background: var(--surface);
+}
+
+.element-tile[data-status='live']:hover {
+  border-color: var(--live-fill-edge);
+  border-width: 2px;
+}
+
+.element-tile[data-status='live']:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* ---------------------------------------------------------------------------
+   The register (§D.5.16, §L.4.5) — walked in registry order; a fresh row
+   starts whenever the declared group changes; up to three elements packed
+   per row. Ten rows result from the six groups' element counts. This is a
+   vertical stack of rows, each row three 509-canvas columns wide — NOT
+   three independent vertical columns. The shell counts nothing and names
+   no group; row boundaries fall wherever generate declarations put them.
+   --------------------------------------------------------------------------- */
+.register-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.register-field__row {
+  display: grid;
+  grid-template-columns: repeat(var(--register-columns), var(--register-column-width));
+  column-gap: var(--register-column-gap);
+}
+
+.register-field__row + .register-field__row[data-fresh-group='true'] {
+  margin-top: var(--register-group-gap);
+}
+
+.register-field__row + .register-field__row[data-fresh-group='false'] {
+  margin-top: var(--register-row-gap);
+}
+
+.register-row {
+  display: grid;
+  grid-template-columns:
+    var(--mark-size) var(--register-title-width) 1fr var(--trend-size);
+  align-items: start;
+  column-gap: var(--space-2);
+  height: var(--register-row-height);
+  padding: 6px var(--space-2); /* BUDGET — 6+6 exact per §L.4.5's row-height arithmetic (25+20+6+6=57), not a spacing-scale choice */
+  border: 1px solid var(--surface-edge);
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.register-row[data-status='inactive'] {
+  background: var(--surface);
+}
+
+.register-row__mark {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: start;
+}
+
+.register-row__title {
+  grid-column: 2;
+  grid-row: 1;
+  font: var(--weight-semibold) var(--type-register-title) / var(--leading-tight) var(--font-family);
+  color: var(--ink-secondary);
+}
+
+.register-row__line2 {
+  grid-column: 2 / span 2;
+  grid-row: 2;
+  font: var(--weight-regular) var(--type-caption) / var(--leading-tight) var(--font-family);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.register-row__hero {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: start;
+}
+
+.register-row__trend {
+  grid-column: 4;
+  grid-row: 1;
+  justify-self: end;
+}
+
+/* ---------------------------------------------------------------------------
+   Band labels (§D.5.14)
+   --------------------------------------------------------------------------- */
+.band-label {
+  height: var(--band-label-block);
+  display: flex;
+  align-items: center;
+  font-size: var(--type-band-label);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-band-label);
+  text-transform: uppercase;
+  color: var(--ink-tertiary);
+}
+
+.band + .band {
+  margin-top: var(--band-separation);
+}

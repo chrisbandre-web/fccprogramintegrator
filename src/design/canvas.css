@@ -1,0 +1,20 @@
+/* TAD §C.5 — the fixed canvas. Infrastructure, not styling: DD §1 makes
+   no-scroll a success-criterion dependency, and overflow: hidden on a
+   fixed-height root is what makes overflow impossible rather than unlikely. */
+
+.canvas-viewport {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--ground);
+}
+
+.canvas-root {
+  width: var(--canvas-width);
+  height: var(--canvas-height);
+  overflow: hidden; /* the structural guarantee */
+  transform: scale(var(--canvas-scale, 1));
+  transform-origin: center;
+}

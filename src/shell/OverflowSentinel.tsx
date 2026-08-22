@@ -39,10 +39,23 @@ export function OverflowSentinel(): JSX.Element | null {
 
   useEffect(() => {
     if (!active) return;
-    // Run after paint, not synchronously — layout must have settled
-    // (fonts loaded, grid resolved) or scrollWidth/clientWidth lie.
-    const raf = requestAnimationFrame(() => setResult(scanForOverruns()));
-    return () => cancelAnimationFrame(raf);
+    let cancelled = false;
+    // Wait for the actual web font, not just a paint frame. fcc-tokens.css
+    // deliberately uses font-display: block, so text is measured against a
+    // FALLBACK font's metrics until Inter finishes loading and swaps in —
+    // scanning before that point measures the wrong font entirely, which
+    // produces exactly the false positives found here (identical-length
+    // strings getting different verdicts, short strings with no visible
+    // ellipsis still flagged). document.fonts.ready resolves once the real
+    // font is available; only then is scrollWidth/clientWidth trustworthy.
+    document.fonts.ready
+      .then(() => new Promise<void>((resolve) => requestAnimationFrame(() => resolve())))
+      .then(() => {
+        if (!cancelled) setResult(scanForOverruns());
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [active, horizon]);
 
   useEffect(() => {

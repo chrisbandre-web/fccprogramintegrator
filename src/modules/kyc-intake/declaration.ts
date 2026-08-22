@@ -38,6 +38,18 @@ const STUB_TREND: Record<ComputeContext['horizon'], 'Increasing' | 'Stable' | 'D
   year: 'Stable',
 };
 
+// DD §2, Coordinator copy 22 Aug 2026 — the module's own trailing-window
+// wording, structurally distinct from the Board's as-at wording
+// (declarations/contexts.ts). Coincides with the Board's at Quarter/Year
+// (both windows happen to be the same length as the Board's offsets) but
+// diverges at Month: the Board reads "Today" (offset 0), the module reads
+// "T-30" (a genuine 30-day trailing window, not "today").
+const MODULE_HORIZON_LEGEND: Record<ComputeContext['horizon'], string> = {
+  month: 'T-30',
+  quarter: 'T-90',
+  year: 'T-365',
+};
+
 function buildElementContent(horizon: ComputeContext['horizon']): ElementContent {
   const authored = source.content[horizon];
   return {
@@ -78,5 +90,6 @@ export const customerIntakeModule: ModuleDeclaration = {
       ],
     },
   ],
+  horizonLegend: MODULE_HORIZON_LEGEND,
   schema: defaultSchema(),
 };

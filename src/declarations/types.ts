@@ -60,6 +60,11 @@ export interface ModuleDeclaration {
   readonly placement: { readonly band: BandId; readonly group: string | null; readonly order: number };
   readonly content: ByHorizon<ElementContent>;
   readonly legend: readonly LegendEntry[];
+  /** The module's own trailing-window wording (DD §2), distinct from the
+   *  Board's as-at wording in ContextDeclaration. Only meaningful for
+   *  status:'live' modules — inactive declarations never become the
+   *  active context, so this is unused for them (empty ByHorizon of ''). */
+  readonly horizonLegend: ByHorizon<string>;
   readonly schema: DeclarationSchema;
   readonly alignment?: RegulatoryAlignment;
   readonly surface?: ComponentType; // live modules only

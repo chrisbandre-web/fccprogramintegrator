@@ -4,13 +4,17 @@
 import type { ByHorizon, ContextDeclaration } from './types.ts';
 
 // DD §2's two horizon wordings — deliberately structurally different so
-// they cannot be collapsed by accident. Board reads "as at"; the module
-// (when active) reads its own trailing-window wording (declared alongside
-// the module itself, TAD §D.6.1).
+// they cannot be collapsed by accident. Board reads "as at" (a point in
+// time, offset from today); the module (when active) reads its own
+// trailing-window wording. Copy from the Coordinator, 22 Aug 2026: Board
+// Month reads "Today" (offset 0) while Quarter/Year read "T-90"/"T-365" —
+// which happen to numerically coincide with the module's own window
+// lengths at Quarter and Year, but diverge at Month, where the module's
+// trailing window is 30 days rather than "today."
 const boardHorizonLegend: ByHorizon<string> = {
-  month: 'As at today',
-  quarter: 'As at 90 days ago',
-  year: 'As at 365 days ago',
+  month: 'Today',
+  quarter: 'T-90',
+  year: 'T-365',
 };
 
 export const boardContext: ContextDeclaration = {

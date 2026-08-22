@@ -70,6 +70,8 @@ function reconstructTrend(slot: GeneratedTrendSlot, id: string): TrendSlot {
   return slot;
 }
 
+const EMPTY_HORIZON_LEGEND = { month: '', quarter: '', year: '' } as const;
+
 function reconstructContent(c: GeneratedElementContent, id: string): ElementContent {
   return {
     title: c.title,
@@ -106,6 +108,7 @@ export function loadInactiveDeclarations(): readonly ModuleDeclaration[] {
       placement: d.placement,
       content,
       legend: [], // inactive elements never become the active context; never read
+      horizonLegend: EMPTY_HORIZON_LEGEND, // same — never read for inactive declarations
       schema: defaultSchema(),
     };
   });

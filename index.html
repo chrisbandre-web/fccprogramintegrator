@@ -2,12 +2,22 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>fccprogramintegrator</title>
+    <title>FCC Program Integrator</title>
+
+    <!-- Font preload BEFORE any stylesheet (TAD §H.3, step 2). crossorigin is
+         required even for a same-origin request per the CORS mode fonts load
+         under; omitting it silently causes a double fetch. -->
+    <link
+      rel="preload"
+      href="/fonts/Inter.var.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

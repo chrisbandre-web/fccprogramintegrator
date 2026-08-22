@@ -1,0 +1,268 @@
+/* =============================================================================
+   FCC Program Integrator — Design System tokens
+   Touch Two · v1.0 · 19 August 2026 · Art Director / Design System owner
+
+   THE ONE TOKEN FILE. Every value the build uses lives here. No component
+   hardcodes a value this file defines. Role names are the vocabulary the
+   Architect and Author bind to and are stable — they come from Design
+   Direction brief §3.1 and are deliberately unchanged.
+
+   CANVAS: designed at 1920 x 1080, scaled uniformly to fit.
+   All px values below are CANVAS px. Rendered size on a 1440 viewport = 0.75x.
+   Every type value carries its rendered size in a comment. The comfort floor
+   is 12.0 RENDERED px; nothing here goes below it.
+   ============================================================================= */
+
+:root {
+
+  /* ---------------------------------------------------------------------------
+     1. GROUND AND SURFACE  (Design Direction brief §4)
+     Two near-tones, not one. The ground stays visible around every object,
+     which is what makes the board read as an object rather than a document.
+     --------------------------------------------------------------------------- */
+
+  --ground:            #F4F3EF;   /* page field, warm off-white. No semantic meaning. */
+  --surface:           #FAF9F6;   /* tiles and panels, raised. No semantic meaning.  */
+                                  /* surface : ground = 1.05:1 — a visible edge, not a step */
+  --surface-edge:      #E4E2DB;   /* 1px keyline defining a surface against the ground */
+
+  /* ---------------------------------------------------------------------------
+     2. INK  (three weights of emphasis; never carries status)
+     --------------------------------------------------------------------------- */
+
+  --ink-primary:       #1A1A1A;   /* 16.53:1 on surface — titles, hero values, table data */
+  --ink-secondary:     #4A4842;   /*  8.68:1 on surface — metric headers, body            */
+  --ink-tertiary:      #6E6A63;   /*  5.11:1 on surface — captions, band labels, legend   */
+
+  /* !! BINDING RULE — INACTIVE ELEMENTS USE PRIMARY INK ONLY.
+     Secondary ink measures 3.75:1 through the scrim and FAILS AA. On any
+     scrimmed element, the metric header and feed caption step up to
+     --ink-primary, which measures 5.95:1 through the scrim. This is not a
+     preference; it is the only combination that clears the floor. */
+
+  /* ---------------------------------------------------------------------------
+     3. ENCODING 1 — MODULE STATUS  (live / inactive)
+     Rule A: fill means live. The live element is the only object whose
+     surface carries colour. Fill wins over mark, always.
+     --------------------------------------------------------------------------- */
+
+  --live-fill:         #88B4CE;   /* 2.00:1 against ground — wins the eye by area, not chroma */
+  --live-fill-edge:    #5E93B2;
+  /* ink-primary on live-fill = 7.85:1 */
+
+  --scrim-opacity:     0.32;      /* PROVISIONAL — confirmed at construction phase 1 exit */
+  --scrim:             rgba(244, 243, 239, 0.32);   /* the ground, veiling. Never a hue. */
+  /* A scrim with its own hue would shift red, amber and green by different
+     perceptual amounts and break Rule C's graduation on 24 of 26 elements. */
+
+  /* ---------------------------------------------------------------------------
+     4. ENCODING 2 — PROGRAM RISK  (bounded mark; never a surface)
+     Two subjects, one ramp (DD v0.7 §5): Business Risk on the two tiles,
+     Control Effectiveness Risk on the 24 register rows.
+     Rule C: saturation graduated by severity. HSL saturation, verified:
+     red 0.734 > amber 0.575 > green 0.180. A healthy board is quiet by
+     construction, not by restraint.
+     --------------------------------------------------------------------------- */
+
+  --status-red:        #A32219;   /* surface 7.12 · scrimmed 3.78 · on live-fill 3.38 */
+  --status-amber:      #73531F;   /* surface 6.68 · scrimmed 3.27 · on live-fill 3.17 */
+  --status-green:      #4E5F42;   /* surface 6.56 · scrimmed 3.21 · on live-fill 3.11 */
+
+  --mark-size:         14px;      /* 10.5 rendered — a Harvey ball, see §5 of the spec */
+  --mark-stroke:       1.75px;
+
+  /* ---------------------------------------------------------------------------
+     5. ENCODING 3 — TREND DIRECTION  (ink only, never status colour)
+     A solid triangular glyph with a short stem. Measured: a line-drawn arrow
+     degrades to a smudge below ~12 rendered px, and the register row gives
+     the indicator 10.5. Rotation and mass carry direction alone.
+     --------------------------------------------------------------------------- */
+
+  --trend-ink:         #1A1A1A;   /* primary, not secondary — it has lost colour's redundancy */
+  --trend-size:        14px;      /* 10.5 rendered */
+  --trend-rotation-rising:   -45deg;
+  --trend-rotation-flat:       0deg;
+  --trend-rotation-falling:   45deg;
+
+  /* ---------------------------------------------------------------------------
+     6. ENCODING 4 — CUSTOMER RISK RATING  (drill-down only, never the board)
+     One hue family, three steps, always label-bearing. Two expressions:
+     BAR fills on the Comparison, TEXT tint on the Records Rating cell.
+     Rule D: chroma decreases with depth — the Comparison carries the ramp
+     doing structural work; the Records carries its quietest step on one cell.
+     --------------------------------------------------------------------------- */
+
+  --risk-bar-high:     #8F4526;   /* label in --surface: 6.55:1 */
+  --risk-bar-medium:   #C08A62;   /* label in --ink-primary: 5.85:1 */
+  --risk-bar-low:      #EADFD4;   /* label in --ink-primary: 13.26:1 */
+  /* adjacency: high|medium 2.31 · medium|low 2.27 — segments separate without labels,
+     though labels are present regardless (Rule E) */
+
+  --risk-text-high:    #8A3F22;   /* 7.09:1 on surface */
+  --risk-text-medium:  #7D5B42;   /* 5.79:1 on surface */
+  --risk-text-low:     #6E6A63;   /* 5.11:1 on surface */
+  /* Text tint, not a cell wash: the Rating column sits mid-table and a wash
+     would run a vertical band of colour down a dense eleven-column grid,
+     reading as structure the table does not have. */
+
+  /* ---------------------------------------------------------------------------
+     7. ACCENT  (focus, links, interactive affordances — never status)
+     On the board the accent appears only on the frame's controls and on the
+     live tile's focus state. The 24 inactive elements carry no accent in any
+     state, because they have no states.
+     --------------------------------------------------------------------------- */
+
+  --accent:            #2B5D7D;   /* 6.38:1 on ground · 6.73:1 on surface */
+  --focus-ring-width:  3px;
+  --focus-ring-offset: 2px;
+  --focus-ring:        3px solid #2B5D7D;
+
+  /* ---------------------------------------------------------------------------
+     8. TYPE
+     One family. Three weights. True tabular lining figures — a hard selection
+     criterion, not a preference. No separate mono family.
+     --------------------------------------------------------------------------- */
+
+  --font-family: "Inter var", "Inter", -apple-system, "Segoe UI", Roboto,
+                 Helvetica, Arial, sans-serif;
+
+  --weight-regular:  400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+
+  --leading-tight: 1.25;
+  --leading-body:  1.5;
+
+  /* canvas px  /  rendered px at 1440 */
+  --type-tile-hero:      40px;  /* 30.0  — the live tile's number            */
+  --type-tile-title:     24px;  /* 18.0                                      */
+  --type-register-hero:  20px;  /* 15.0  — sets register row line 1 height   */
+  --type-register-title: 18px;  /* 13.5                                      */
+  --type-metric-header:  16px;  /* 12.0  — AT THE FLOOR                      */
+  --type-caption:        16px;  /* 12.0  — AT THE FLOOR, and under the scrim */
+  --type-band-label:     16px;  /* 12.0  — caps, tracked                     */
+  --type-legend:         16px;  /* 12.0                                      */
+  --type-table:          16px;  /* 12.0                                      */
+  --type-body:           18px;  /* 13.5  — About modal                       */
+  --type-modal-heading:  24px;  /* 18.0                                      */
+
+  --tracking-band-label: 0.08em;
+
+  /* !! NOTHING IN THIS SCALE MAY BE REDUCED. 16px canvas is 12.0px rendered,
+     which is the practitioner comfort floor, and the caption sits at it while
+     also having to clear AA through the scrim. It is the binding constraint
+     in the system. */
+
+  /* ---------------------------------------------------------------------------
+     9. SPACING — 8-point base, no exceptions
+     --------------------------------------------------------------------------- */
+
+  --space-1:   4px;
+  --space-2:   8px;
+  --space-3:  16px;
+  --space-4:  24px;
+  --space-6:  32px;
+  --space-8:  48px;
+  --space-10: 64px;
+
+  /* ---------------------------------------------------------------------------
+     10. LAYOUT — measured, not chosen. See spec §2 for the arithmetic.
+     --------------------------------------------------------------------------- */
+
+  --canvas-width:        1920px;
+  --canvas-height:       1080px;
+  --canvas-margin:         32px;
+
+  --frame-width:          288px;  /* 216 rendered — driven by the two-entry legend */
+  --field-width:         1576px;
+  --field-gutter:          24px;
+
+  --tile-band-height:     140px;
+  --tile-gap:              24px;
+
+  --register-columns:         3;
+  --register-column-width: 509px;
+  --register-column-gap:   24px;
+  --register-row-height:   57px;  /* 42.75 rendered — line1 25 + line2 20 + 6+6 padding */
+  --register-row-gap:       8px;  /* within a group */
+  --register-group-gap:    24px;  /* BETWEEN groups — the only carrier of exam-manual
+                                     grouping now that subheadings are dropped.
+                                     Must read as a boundary, not a larger gap. */
+
+  --band-label-block:      48px;
+  --band-separation:       24px;
+
+  /* Vertical budget: 980 used against 1016 available. Slack 36 canvas / 27
+     rendered, held in reserve against the phase 1 scrim verification. */
+
+  /* ---------------------------------------------------------------------------
+     11. MOTION — functional only, always with a reduced-motion equivalent
+     --------------------------------------------------------------------------- */
+
+  --motion-collapse:   240ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  --motion-reveal:     180ms cubic-bezier(0.4, 0.0, 0.2, 1);
+  --motion-state:      120ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-collapse: 0ms;
+    --motion-reveal:   0ms;
+    --motion-state:    0ms;
+  }
+}
+
+/* =============================================================================
+   FONT LOADING
+   Written for first-time execution. Every value below is precomputed; nothing
+   here requires research or judgement at the terminal.
+
+   STEP 1 — place Inter.var.woff2 in /public/fonts/
+   STEP 2 — in index.html <head>, BEFORE any stylesheet:
+       <link rel="preload" href="/fonts/Inter.var.woff2"
+             as="font" type="font/woff2" crossorigin>
+   STEP 3 — the two @font-face blocks below, in this order.
+   STEP 4 — cold-load check at construction phase 1 exit: open the deployed
+       URL in a private window on a machine that has never seen the site and
+       confirm the board paints in Inter with no reflow across the elements.
+   ============================================================================= */
+
+@font-face {
+  font-family: "Inter var";
+  src: url("/fonts/Inter.var.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: block;
+  /* block, not swap: swap produces a visible reflow across 24 register rows at
+     the exact instant the 12-second criterion is measured. With a same-origin
+     preloaded woff2 the block period is effectively never reached; and if it
+     ever is, the metric-matched fallback below means no reflow occurs anyway. */
+}
+
+/* Metric-matched fallback. Inter x-height 0.546 em; Arial 0.519 em.
+   size-adjust = 546 / 519 = 105.2%. These overrides make the fallback occupy
+   the same space as Inter, so a swap — if one ever happens — does not move
+   a single line of the board. */
+@font-face {
+  font-family: "Inter fallback";
+  src: local("Arial"), local("Helvetica Neue"), local("Segoe UI"), local("Roboto");
+  size-adjust:        105.2%;
+  ascent-override:     90.0%;
+  descent-override:    22.5%;
+  line-gap-override:    0.0%;
+}
+
+/* =============================================================================
+   RECORDED REJECTION
+   A hosted webfont service (Google Fonts, Adobe Fonts, or equivalent) is
+   REJECTED, not omitted: it places a third-party request on the critical path
+   to first paint, on a demo whose leading success criterion is measured at
+   first paint.
+
+   RECORDED FALLBACK
+   If the cold-load check misbehaves and one round of fixing does not clear it,
+   swap --font-family to the system stack and ship. The type scale was set so
+   this is a swap and not a redesign: the common system faces sit at x-height
+   0.50-0.53 against Inter's 0.546, within ~5%, so every size in §8 remains
+   viable unchanged.
+   ============================================================================= */

@@ -137,18 +137,35 @@
   color: var(--ink-secondary);
 }
 
-.register-row__line2 {
-  grid-column: 2 / span 2;
+/* Source (feed caption) — left-aligned under the title, row 2. */
+.register-row__source {
+  grid-column: 2;
   grid-row: 2;
   font: var(--weight-regular) var(--type-caption) / var(--leading-tight) var(--font-family);
   white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Metric header — centered under the hero column, row 2, so the number
+   and what it measures read as one visual pair. Split from the source
+   into its own cell (rather than one flowing line-2 string) precisely so
+   this centering is possible independent of the source's length.
+   Fixed from a live screenshot, 22 Aug 2026 (Chris). */
+.register-row__metric {
+  grid-column: 3;
+  grid-row: 2;
+  text-align: center;
+  font: var(--weight-regular) var(--type-caption) / var(--leading-tight) var(--font-family);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .register-row__hero {
   grid-column: 3;
   grid-row: 1;
-  justify-self: start;
+  justify-self: center; /* matches register-row__metric's centering below it */
 }
 
 .register-row__trend {

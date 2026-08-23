@@ -49,16 +49,29 @@ export function ElementTile({
 
   const truncate = { whiteSpace: 'nowrap' as const, overflow: 'hidden' as const, textOverflow: 'ellipsis' as const };
 
+  // Title and metric header now share one row instead of stacking as two
+  // separate lines — Chris's suggestion, 22 Aug 2026, to close the
+  // vertical-content shortfall inside the fixed 140px tile-band height.
+  // A shared row's height is the TALLER of the two (title's 30px), not
+  // both lines added together (30+20=50), recovering 20px of the 26px
+  // measured shortfall on its own — title never truncates (flexShrink:
+  // 0, it's the more load-bearing of the two); metric header truncates
+  // if the combined row doesn't have room for both (minWidth: 0 is
+  // required for a flex child to shrink below its content's natural
+  // width — without it, overflow/ellipsis on a flex item is silently
+  // ignored).
   const inner = (
     <>
-      <span className="truncate-text" style={{ font: 'var(--weight-semibold) var(--type-tile-title) / var(--leading-tight) var(--font-family)', color: 'var(--ink-primary)', ...truncate }}>
-        {content.title}
-      </span>
-      {content.metricHeader && (
-        <span className="truncate-text" style={{ font: 'var(--weight-regular) var(--type-metric-header) / var(--leading-tight) var(--font-family)', color: bodyInk, ...truncate }}>
-          {content.metricHeader}
+      <div style={{ display: 'flex', alignItems: 'baseline', gap: 'var(--space-1)' }}>
+        <span className="truncate-text" style={{ font: 'var(--weight-semibold) var(--type-tile-title) / var(--leading-tight) var(--font-family)', color: 'var(--ink-primary)', flexShrink: 0, ...truncate }}>
+          {content.title}
         </span>
-      )}
+        {content.metricHeader && (
+          <span className="truncate-text" style={{ font: 'var(--weight-regular) var(--type-metric-header) / var(--leading-tight) var(--font-family)', color: bodyInk, minWidth: 0, ...truncate }}>
+            {content.metricHeader}
+          </span>
+        )}
+      </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)', marginTop: 'auto' }}>
         {hero && <HeroValue value={hero.value} unit={hero.unit} size="tile" />}
         {trend && <TrendGlyph value={trend} />}

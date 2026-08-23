@@ -116,6 +116,35 @@ function checkNoInkSecondaryUnderScrim(): void {
   );
 }
 
+// --- Mark/glyph shape-color coupling (Architect's note, 23 Aug 2026) ------
+
+function checkHealthMarkIsOnlyStatusColorReference(): void {
+  // Shape and hue must derive from the same value through one exhaustive
+  // switch in HealthMark, never duplicated elsewhere — a second reference
+  // is how a mark could exist with the right colour and the wrong form.
+  const files = walk(join(ROOT, 'src'), ['.ts', '.tsx']).filter(
+    (f) => f !== join(ROOT, 'src/design/tokens.css'),
+  );
+  const pattern = /--status-(red|amber|green)/;
+  const offenders: string[] = [];
+  for (const f of files) {
+    if (f === join(ROOT, 'src/shell/HealthMark.tsx')) continue;
+    // Strip comments before matching — a comment explaining why a file
+    // deliberately avoids these tokens (e.g. OverflowSentinel) is not a
+    // usage of them.
+    const codeOnly = readFileSync(f, 'utf-8').replace(/\/\/.*$/gm, '').replace(/\/\*[\s\S]*?\*\//g, '');
+    if (pattern.test(codeOnly)) {
+      offenders.push(f.replace(ROOT + '/', ''));
+    }
+  }
+  record(
+    'TAD-20',
+    'HealthMark is the only file referencing --status-red|amber|green',
+    offenders.length === 0,
+    offenders.join('; '),
+  );
+}
+
 // --- TAD-9 (§L.3) — generated files carry the header and are byte-stable --
 
 function checkGeneratedFileHeader(): void {
@@ -196,6 +225,7 @@ function checkBuild(): void {
 checkNoRawColorLiterals();
 checkNoRawPxOutsideTokens();
 checkNoInkSecondaryUnderScrim();
+checkHealthMarkIsOnlyStatusColorReference();
 checkGeneratedFileHeader();
 checkDeclarationGateConditions();
 checkTypecheck();

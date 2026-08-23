@@ -120,7 +120,13 @@ export function OverflowSentinel(): JSX.Element | null {
         padding: '4px 8px',
         background: 'var(--surface)',
         borderTop: '1px solid var(--surface-edge)',
-        color: result.overruns.length === 0 ? 'var(--status-green)' : 'var(--status-red)',
+        // Deliberately NOT --status-red/green — those are HealthMark's
+        // semantic tokens, and this is a dev-only diagnostic overlay, not
+        // product surface. npm run check asserts HealthMark is the ONLY
+        // file referencing them (Architect's note, Mark and Glyph, 23 Aug
+        // 2026); this line relies on the text itself ("no overruns" vs
+        // "N overrun(s)") rather than colour to convey status.
+        color: 'var(--ink-primary)',
         fontWeight: 'var(--weight-semibold)',
         font: '12px monospace',
         cursor: 'pointer',

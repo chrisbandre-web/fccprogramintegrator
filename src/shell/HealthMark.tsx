@@ -1,3 +1,13 @@
+// TAD §D.5.19, Design System spec §5, corrected per the Architect's note
+// (Mark and Glyph, 23 Aug 2026): the mark must be a Harvey ball, not a
+// uniform filled disc — shape carries severity redundantly with hue, since
+// at 14 canvas there's no room for a label beside the mark, and hue alone
+// would violate Rule E (colour as sole carrier of meaning). Shape and hue
+// both derive from the same `value` prop through one exhaustive switch,
+// so a mark can never exist with the right colour and the wrong form.
+const CENTER = 7;
+const RADIUS = 6; // fits inside the 14x14 viewBox with --mark-stroke (1.75) room to spare
+
 const HEALTH_TOKEN: Record<'Red' | 'Amber' | 'Green', string> = {
   Red: 'var(--status-red)',
   Amber: 'var(--status-amber)',
@@ -10,20 +20,29 @@ const HEALTH_LABEL: Record<'Red' | 'Amber' | 'Green', string> = {
   Green: 'Green — within appetite',
 };
 
-// TAD — a solid dot, --mark-size, coloured by the status token. Absence is
-// handled by the caller not rendering it, never by rendering a neutral mark.
 export function HealthMark({ value }: { value: 'Red' | 'Amber' | 'Green' }): JSX.Element {
+  const color = HEALTH_TOKEN[value];
   return (
-    <span
+    <svg
+      viewBox="0 0 14 14"
+      style={{ width: 'var(--mark-size)', height: 'var(--mark-size)' }}
       role="img"
       aria-label={HEALTH_LABEL[value]}
-      style={{
-        display: 'inline-block',
-        width: 'var(--mark-size)',
-        height: 'var(--mark-size)',
-        borderRadius: '50%',
-        background: HEALTH_TOKEN[value],
-      }}
-    />
+    >
+      {value === 'Red' && <circle cx={CENTER} cy={CENTER} r={RADIUS} fill={color} />}
+      {value === 'Amber' && (
+        // Right-half fill — a consistent choice, same half on every Amber
+        // mark, per the Architect's note (either half is acceptable
+        // provided it's applied uniformly).
+        <path
+          d={`M ${CENTER} ${CENTER - RADIUS} A ${RADIUS} ${RADIUS} 0 0 1 ${CENTER} ${CENTER + RADIUS} L ${CENTER} ${CENTER} Z`}
+          fill={color}
+        />
+      )}
+      {/* The stroked outline — always present. Alone (Green) it reads as
+          an open circle; underneath a fill (Red, Amber) it's simply the
+          mark's edge. */}
+      <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="none" stroke={color} strokeWidth="var(--mark-stroke)" />
+    </svg>
   );
 }

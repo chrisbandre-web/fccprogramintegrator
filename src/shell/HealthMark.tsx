@@ -41,8 +41,16 @@ export function HealthMark({ value }: { value: 'Red' | 'Amber' | 'Green' }): JSX
       )}
       {/* The stroked outline — always present. Alone (Green) it reads as
           an open circle; underneath a fill (Red, Amber) it's simply the
-          mark's edge. */}
-      <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="none" stroke={color} strokeWidth="var(--mark-stroke)" />
+          mark's edge. strokeWidth moved to `style` rather than a raw SVG
+          attribute — 23 Aug 2026, per the Design System owner's finding
+          that Green vs. the process-exemption's no-mark-at-all read too
+          similarly at 10.5px rendered. A raw SVG presentation attribute's
+          var() resolution is less consistently reliable across browsers
+          than a genuine CSS style property; if the stroke had ever been
+          silently falling back to SVG's default 1px instead of the full
+          1.75px, that alone would explain a weaker, less deliberate-looking
+          ring. */}
+      <circle cx={CENTER} cy={CENTER} r={RADIUS} fill="none" stroke={color} style={{ strokeWidth: 'var(--mark-stroke)' }} />
     </svg>
   );
 }

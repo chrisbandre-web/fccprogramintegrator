@@ -41,10 +41,16 @@ export function TrendGlyph({ value }: { value: TrendValue }): JSX.Element {
       aria-label={LABEL[value]}
     >
       <g transform={`rotate(${ROTATION_DEG[value]} 7 7)`}>
-        {/* Stem */}
-        <line x1="1" y1="7" x2="7" y2="7" stroke="var(--trend-ink)" strokeWidth="2" strokeLinecap="round" />
-        {/* Arrowhead — solid triangle, apex pointing right at 0deg */}
-        <polygon points="7,3 7,11 13,7" fill="var(--trend-ink)" />
+        {/* Stem — short, per spec. Widened slightly (2 -> 2.5) to feel
+            consistent with the bolder arrowhead below. */}
+        <line x1="1" y1="7" x2="5" y2="7" stroke="var(--trend-ink)" strokeWidth="2.5" strokeLinecap="round" />
+        {/* Arrowhead — enlarged 23 Aug 2026 (Design System owner's
+            finding, from the deployed board: glyphs were reading as
+            strokes, not solid triangles, at 10.5 rendered px). Base
+            height was 8 of 14 canvas units; now 10, leaving only a 2-unit
+            margin top and bottom — more mass without touching the
+            viewBox or rotation pivot. */}
+        <polygon points="5,2 5,12 13,7" fill="var(--trend-ink)" />
       </g>
     </svg>
   );

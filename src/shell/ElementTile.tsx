@@ -34,10 +34,15 @@ export function ElementTile({
   const health = content.health.kind === 'authored' ? content.health.value : null;
 
   const interactive = status === 'live' && !!onActivate;
-  // TAD Handoff, "load-bearing not stylistic" #5: scrimmed elements set
-  // their metric header and caption in PRIMARY ink — secondary fails AA
-  // through the scrim (3.75:1). Only the live tile is scrimmed.
-  const bodyInk = status === 'live' ? 'var(--ink-primary)' : 'var(--ink-secondary)';
+  // Corrected per the Design System Spec §8.1 (verified directly, 23 Aug
+  // 2026, after the Design System owner's note revealed the original
+  // reading was backwards): scrim belongs to INACTIVE elements, not the
+  // live tile. "Surface = live-fill... ink-primary throughout" (Live) vs
+  // "Surface + scrim 0.32... ink-primary for all text" (Inactive) — both
+  // states use primary ink for metric header and caption, for different
+  // reasons (live: design emphasis; inactive: secondary fails AA through
+  // the scrim, 3.75:1). So it's simply primary, always, for these two
+  // fields — no live/inactive branch needed here at all.
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (!interactive) return;
@@ -67,7 +72,7 @@ export function ElementTile({
           {content.title}
         </span>
         {content.metricHeader && (
-          <span className="truncate-text" style={{ font: 'var(--weight-regular) var(--type-metric-header) / var(--leading-tight) var(--font-family)', color: bodyInk, minWidth: 0, ...truncate }}>
+          <span className="truncate-text" style={{ font: 'var(--weight-regular) var(--type-metric-header) / var(--leading-tight) var(--font-family)', color: 'var(--ink-primary)', minWidth: 0, ...truncate }}>
             {content.metricHeader}
           </span>
         )}
@@ -77,7 +82,7 @@ export function ElementTile({
         {trend && <TrendGlyph value={trend} />}
         {health && <HealthMark value={health} />}
       </div>
-      <span className="truncate-text" style={{ font: 'var(--weight-regular) var(--type-caption) / var(--leading-tight) var(--font-family)', color: bodyInk, ...truncate }}>
+      <span className="truncate-text" style={{ font: 'var(--weight-regular) var(--type-caption) / var(--leading-tight) var(--font-family)', color: 'var(--ink-primary)', ...truncate }}>
         {content.feedCaption}
       </span>
     </>
@@ -85,7 +90,7 @@ export function ElementTile({
 
   return (
     <div
-      className={`element-tile${status === 'live' ? ' scrim' : ''}`}
+      className={`element-tile${status === 'inactive' ? ' scrim' : ''}`}
       data-status={status}
       data-element-id={id}
       role={interactive ? 'button' : undefined}

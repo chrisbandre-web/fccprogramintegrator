@@ -9,7 +9,7 @@ export function RegisterRow({ id, content }: { id: string; content: ElementConte
   const health = content.health.kind === 'authored' ? content.health.value : null;
 
   return (
-    <div className="register-row" data-status="inactive" data-element-id={id}>
+    <div className="register-row scrim" data-status="inactive" data-element-id={id}>
       <span className="register-row__mark">{health && <HealthMark value={health} />}</span>
       <span className="register-row__title truncate-text">{content.title}</span>
       <span className="register-row__source truncate-text">{content.feedCaption}</span>

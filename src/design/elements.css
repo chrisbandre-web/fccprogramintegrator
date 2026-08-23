@@ -1,15 +1,9 @@
 /* TAD §D.7.2 — elements.css holds the scrim class, the register grid
    template and the tile arrangement, all expressed in tokens.
 
-   --register-title-width does not yet exist in fcc-tokens.css (TAD §F.10,
-   §F.25, §L.1). It is requested as a Touch Two addition and carried here,
-   provisionally, at 232 canvas, until the Design System owner confirms it
-   at the phase 1 exit — at which point it moves into tokens.css and this
-   local declaration is deleted. It is declared here rather than inline in
-   a component so there is exactly one place to change when it is confirmed. */
-:root {
-  --register-title-width: 232px; /* PROVISIONAL — see note above */
-}
+   --register-title-width: confirmed by the Design System owner, 23 Aug
+   2026, at 232px canvas, and promoted into fcc-tokens.css itself. The
+   local provisional override that used to live here is gone. */
 
 /* ---------------------------------------------------------------------------
    ScrimLayer (§D.5.22) — the one place the scrim exists.
@@ -17,22 +11,40 @@
    scrim (secondary fails AA at 3.75:1). Enforced here, in the one class,
    rather than trusted to 24 call sites.
    --------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------
+   ScrimLayer (§D.5.22, Design System Spec §8.1) — the one place the scrim
+   exists. Applies to INACTIVE elements (both tiles and register rows), not
+   the live tile — corrected 23 Aug 2026 after the Design System owner's
+   review revealed this was backwards for the entire build (scrim = muting
+   for inactive elements; the live tile is plain, unveiled live-fill).
+
+   Structural fix, same date: the veil must sit visually OVER the mark and
+   text, not just behind the background. A ::before pseudo-element paints
+   BEFORE the element's real children by default, and this class had
+   additionally lifted children to position:relative to guarantee they sat
+   above it — meaning nothing was ever actually being veiled; only the
+   background was. Confirmed by reproducing the token file's own documented
+   scrim contrast figures exactly (3.75 / 3.79 / 3.26 / 3.20) only when both
+   the mark/ink color AND the background are independently blended toward
+   ground at the scrim opacity — a foreground effect, not a background-only
+   one. ::after paints AFTER the element's real children by default, which
+   is what makes this correct without the position trick.
+
+   Binding rule: metric header and caption set to PRIMARY ink through the
+   scrim (secondary fails AA at 3.75:1). Enforced here, in the one class,
+   rather than trusted to 24 call sites. */
 .scrim {
   position: relative;
   color: var(--ink-primary);
   transition: background-color var(--motion-state);
 }
 
-.scrim::before {
+.scrim::after {
   content: '';
   position: absolute;
   inset: 0;
   background: var(--scrim);
   pointer-events: none;
-}
-
-.scrim > * {
-  position: relative;
 }
 
 /* ---------------------------------------------------------------------------

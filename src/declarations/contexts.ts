@@ -29,7 +29,11 @@ export const boardContext: ContextDeclaration = {
     },
     {
       kind: 'health-and-trend',
-      label: 'Control Risk',
+      // Corrected 23 Aug 2026 (Design System owner's finding, from the
+      // deployed board): the authorised forms are "Control Effectiveness
+      // Risk" (preferred) or "Effectiveness Risk" (short) — "Control Risk"
+      // is neither, and drops the word the encoding actually turns on.
+      label: 'Control Effectiveness Risk',
       markMeans:
         'how close the control is to allowing the risk exposure it was specifically designed to prevent',
       arrowMeans: 'the direction the metric is moving',

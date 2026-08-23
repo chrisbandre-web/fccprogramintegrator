@@ -50,10 +50,21 @@
   --live-fill-edge:    #5E93B2;
   /* ink-primary on live-fill = 7.85:1 */
 
-  --scrim-opacity:     0.32;      /* PROVISIONAL — confirmed at construction phase 1 exit */
+  --scrim-opacity:     0.32;      /* CONFIRMED at phase 1 exit — held at 0.32, not raised to the
+                                      0.40 the Design System owner recommended after the whole-board
+                                      screenshot review (23 Aug 2026): at 0.40, status-amber and
+                                      status-green both drop below the 3:1 floor on a scrimmed mark
+                                      (2.77 / 2.72) — exactly what E2 warned a heavier veil would do.
+                                      The caption/ink side of that recommendation holds fine
+                                      (ink-primary 4.55:1 at 0.40); it's the marks that don't.
+                                      Open with the Design System owner, not resolved unilaterally. */
   --scrim:             rgba(244, 243, 239, 0.32);   /* the ground, veiling. Never a hue. */
   /* A scrim with its own hue would shift red, amber and green by different
      perceptual amounts and break Rule C's graduation on 24 of 26 elements. */
+  /* Scrim and fill are mutually exclusive — no element is ever both. Fill
+     means live (the one live tile, unveiled); scrim means inactive (the
+     other 25 elements, veiled). A "scrim over live-fill" background does
+     not occur on the board. (Design System owner, 23 Aug 2026.) */
 
   /* ---------------------------------------------------------------------------
      4. ENCODING 2 — PROGRAM RISK  (bounded mark; never a surface)
@@ -183,6 +194,7 @@
   --register-columns:         3;
   --register-column-width: 509px;
   --register-column-gap:   24px;
+  --register-title-width:  232px;  /* CONFIRMED, 23 Aug 2026 — longest title (Models & Non-model Tools) measures ~206 canvas at 18px Inter; 26 canvas headroom. Promoted from a local code override; was a Touch Two addition not yet in this file. */
   --register-row-height:   57px;  /* 42.75 rendered — line1 25 + line2 20 + 6+6 padding */
   --register-row-gap:       8px;  /* within a group */
   --register-group-gap:    24px;  /* BETWEEN groups — the only carrier of exam-manual

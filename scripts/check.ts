@@ -77,40 +77,61 @@ function checkNoRawPxOutsideTokens(): void {
   const offenders: string[] = [];
   for (const f of files) {
     const content = readFileSync(f, 'utf-8');
-    for (const line of content.split('\n')) {
-      const trimmed = line.trim();
-      if (trimmed.startsWith('/*') || trimmed.startsWith('*')) continue;
-      // Strip a trailing inline comment before checking for px literals —
-      // a px value mentioned in prose (e.g. explaining a bug) is not a
-      // style declaration.
-      const codeOnly = trimmed.replace(/\/\*.*?\*\//g, '').trim();
-      if (exemptPatterns.some((p) => p.test(trimmed))) continue;
-      const matches = codeOnly.match(pxPattern);
-      if (matches) offenders.push(`${f.replace(ROOT + '/', '')}: "${trimmed}"`);
+    const originalLines = content.split('\n');
+    // Strip block comments across the WHOLE file first (dotAll-equivalent
+    // via [\s\S]) — a comment spanning multiple lines has no per-line
+    // /* or */ marker on its middle lines, so a line-by-line strip can't
+    // see it's still inside a comment and wrongly treats prose like
+    // "...232px canvas..." as a style declaration. Exemption markers
+    // (PROVISIONAL/BUDGET) are still checked against the ORIGINAL line,
+    // since those always live in a same-line trailing comment.
+    const codeOnlyLines = content
+      .replace(/\/\*[\s\S]*?\*\//g, (match) => '\n'.repeat((match.match(/\n/g) ?? []).length))
+      .split('\n');
+    for (let i = 0; i < codeOnlyLines.length; i++) {
+      const codeLine = (codeOnlyLines[i] ?? '').trim();
+      const originalLine = (originalLines[i] ?? '').trim();
+      if (exemptPatterns.some((p) => p.test(originalLine))) continue;
+      const matches = codeLine.match(pxPattern);
+      if (matches) offenders.push(`${f.replace(ROOT + '/', '')}: "${originalLine}"`);
     }
   }
   record('TAD-5', 'No raw px spacing/sizing values outside src/design/tokens.css', offenders.length === 0, offenders.join('; '));
 }
 
 function checkNoInkSecondaryUnderScrim(): void {
-  // Defensive grep: ElementTile is the one file allowed to reference
-  // --ink-secondary conditionally, and only ever for the non-live
-  // (unscrimmed) path. A literal 'var(--ink-secondary)' hardcoded onto a
-  // scrimmed element elsewhere in src/shell is exactly the mistake TAD
-  // Handoff point 5 warns about.
-  const files = walk(join(ROOT, 'src', 'shell'), ['.tsx']);
+  // Rewritten 23 Aug 2026 after the scrim/fill correction (Design System
+  // Spec §8.1, verified directly): scrim belongs to INACTIVE elements —
+  // both tiles and register rows — not the live tile, which was this
+  // build's original (backwards) assumption. Metric header and caption
+  // now use ink-primary unconditionally in ElementTile.tsx (no live/
+  // inactive branch), and RegisterRow's source/metric spans rely on
+  // inheriting ink-primary from the .scrim class on their ancestor —
+  // which only works if those CSS rules don't hardcode a color of their
+  // own. This check verifies both halves of that invariant directly,
+  // rather than pattern-matching a specific variable name that no longer
+  // exists.
   const offenders: string[] = [];
-  for (const f of files) {
-    const content = readFileSync(f, 'utf-8');
-    if (content.includes("className={`element-tile") || content.includes('scrim')) {
-      if (/color:\s*['"]var\(--ink-secondary\)['"]/.test(content) && !content.includes('bodyInk')) {
-        offenders.push(f.replace(ROOT + '/', ''));
-      }
+
+  const tileFile = join(ROOT, 'src', 'shell', 'ElementTile.tsx');
+  const tileContent = readFileSync(tileFile, 'utf-8');
+  if (/metricHeader[\s\S]{0,300}?ink-secondary/.test(tileContent) || /feedCaption[\s\S]{0,300}?ink-secondary/.test(tileContent)) {
+    offenders.push(`${tileFile.replace(ROOT + '/', '')}: metric header or caption hardcodes ink-secondary`);
+  }
+
+  const cssFile = join(ROOT, 'src', 'design', 'elements.css');
+  const cssContent = readFileSync(cssFile, 'utf-8');
+  for (const selector of ['.register-row__source', '.register-row__metric > span']) {
+    const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const match = cssContent.match(new RegExp(`${escaped}\\s*\\{([^}]*)\\}`));
+    if (match && /color:\s*var\(--ink-secondary\)/.test(match[1] ?? '')) {
+      offenders.push(`${cssFile.replace(ROOT + '/', '')}: ${selector} hardcodes ink-secondary, which would override the inherited primary from .scrim`);
     }
   }
+
   record(
     'TAD-6',
-    'No hardcoded --ink-secondary on a scrimmed element (primary ink required, see Handoff #5)',
+    'Scrimmed (inactive) elements use primary ink for metric header / caption, never secondary',
     offenders.length === 0,
     offenders.join('; '),
   );

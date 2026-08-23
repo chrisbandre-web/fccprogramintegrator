@@ -381,7 +381,7 @@
       "content": {
         "month": {
           "title": "TM",
-          "metricHeader": "% TM alerts past closure date",
+          "metricHeader": "% TM alerts past due",
           "hero": {
             "kind": "authored",
             "value": 1.2,
@@ -399,7 +399,7 @@
         },
         "quarter": {
           "title": "TM",
-          "metricHeader": "% TM alerts past closure date",
+          "metricHeader": "% TM alerts past due",
           "hero": {
             "kind": "authored",
             "value": 0.8,
@@ -417,7 +417,7 @@
         },
         "year": {
           "title": "TM",
-          "metricHeader": "% TM alerts past closure date",
+          "metricHeader": "% TM alerts past due",
           "hero": {
             "kind": "authored",
             "value": 0.4,
@@ -511,7 +511,7 @@
       "content": {
         "month": {
           "title": "Regulatory Reporting",
-          "metricHeader": "# Regulatory Reports Overdue",
+          "metricHeader": "# Reg Reports Overdue",
           "hero": {
             "kind": "authored",
             "value": 2,
@@ -529,7 +529,7 @@
         },
         "quarter": {
           "title": "Regulatory Reporting",
-          "metricHeader": "# Regulatory Reports Overdue",
+          "metricHeader": "# Reg Reports Overdue",
           "hero": {
             "kind": "authored",
             "value": 0,
@@ -547,7 +547,7 @@
         },
         "year": {
           "title": "Regulatory Reporting",
-          "metricHeader": "# Regulatory Reports Overdue",
+          "metricHeader": "# Reg Reports Overdue",
           "hero": {
             "kind": "authored",
             "value": 0,
@@ -1031,7 +1031,7 @@
       "content": {
         "month": {
           "title": "Exam / Audit Mgmt.",
-          "metricHeader": "# recent Audit and Exam Findings",
+          "metricHeader": "# Audit/Exam Findings",
           "hero": {
             "kind": "authored",
             "value": 2,
@@ -1049,7 +1049,7 @@
         },
         "quarter": {
           "title": "Exam / Audit Mgmt.",
-          "metricHeader": "# recent Audit and Exam Findings",
+          "metricHeader": "# Audit/Exam Findings",
           "hero": {
             "kind": "authored",
             "value": 0,
@@ -1067,7 +1067,7 @@
         },
         "year": {
           "title": "Exam / Audit Mgmt.",
-          "metricHeader": "# recent Audit and Exam Findings",
+          "metricHeader": "# Audit/Exam Findings",
           "hero": {
             "kind": "authored",
             "value": 0,
@@ -1161,7 +1161,7 @@
       "content": {
         "month": {
           "title": "Change Mgmt.",
-          "metricHeader": "# FCC program initiatives overdue",
+          "metricHeader": "# FCC initiatives overdue",
           "hero": {
             "kind": "authored",
             "value": 3,
@@ -1179,7 +1179,7 @@
         },
         "quarter": {
           "title": "Change Mgmt.",
-          "metricHeader": "# FCC program initiatives overdue",
+          "metricHeader": "# FCC initiatives overdue",
           "hero": {
             "kind": "authored",
             "value": 2,
@@ -1197,7 +1197,7 @@
         },
         "year": {
           "title": "Change Mgmt.",
-          "metricHeader": "# FCC program initiatives overdue",
+          "metricHeader": "# FCC initiatives overdue",
           "hero": {
             "kind": "authored",
             "value": 0,
@@ -1226,7 +1226,7 @@
       "content": {
         "month": {
           "title": "Data Management",
-          "metricHeader": "# KDEs requiring remediation",
+          "metricHeader": "# KDEs to remediate",
           "hero": {
             "kind": "authored",
             "value": 18,
@@ -1244,7 +1244,7 @@
         },
         "quarter": {
           "title": "Data Management",
-          "metricHeader": "# KDEs requiring remediation",
+          "metricHeader": "# KDEs to remediate",
           "hero": {
             "kind": "authored",
             "value": 11,
@@ -1262,7 +1262,7 @@
         },
         "year": {
           "title": "Data Management",
-          "metricHeader": "# KDEs requiring remediation",
+          "metricHeader": "# KDEs to remediate",
           "hero": {
             "kind": "authored",
             "value": 2,
@@ -1291,7 +1291,7 @@
       "content": {
         "month": {
           "title": "Models & Non-model Tools",
-          "metricHeader": "# model validations overdue",
+          "metricHeader": "# model validations due",
           "hero": {
             "kind": "authored",
             "value": 2,
@@ -1309,7 +1309,7 @@
         },
         "quarter": {
           "title": "Models & Non-model Tools",
-          "metricHeader": "# model validations overdue",
+          "metricHeader": "# model validations due",
           "hero": {
             "kind": "authored",
             "value": 1,
@@ -1327,7 +1327,7 @@
         },
         "year": {
           "title": "Models & Non-model Tools",
-          "metricHeader": "# model validations overdue",
+          "metricHeader": "# model validations due",
           "hero": {
             "kind": "authored",
             "value": 1,
@@ -1356,7 +1356,7 @@
       "content": {
         "month": {
           "title": "Information Sharing",
-          "metricHeader": "# information sharing requests overdue",
+          "metricHeader": "# info sharing overdue",
           "hero": {
             "kind": "authored",
             "value": 0,
@@ -1374,7 +1374,7 @@
         },
         "quarter": {
           "title": "Information Sharing",
-          "metricHeader": "# information sharing requests overdue",
+          "metricHeader": "# info sharing overdue",
           "hero": {
             "kind": "authored",
             "value": 0,
@@ -1392,7 +1392,7 @@
         },
         "year": {
           "title": "Information Sharing",
-          "metricHeader": "# information sharing requests overdue",
+          "metricHeader": "# info sharing overdue",
           "hero": {
             "kind": "authored",
             "value": 0,
@@ -1476,7 +1476,7 @@
       }
     },
     {
-      "id": "fcc-risk-appetite-statement",
+      "id": "risk-appetite-statement",
       "status": "inactive",
       "placement": {
         "band": "program-elements",
@@ -1485,7 +1485,7 @@
       },
       "content": {
         "month": {
-          "title": "FCC Risk Appetite Statement",
+          "title": "Risk Appetite Statement",
           "metricHeader": "# risk appetite breaches",
           "hero": {
             "kind": "authored",
@@ -1503,7 +1503,7 @@
           "feedCaption": "AML Team"
         },
         "quarter": {
-          "title": "FCC Risk Appetite Statement",
+          "title": "Risk Appetite Statement",
           "metricHeader": "# risk appetite breaches",
           "hero": {
             "kind": "authored",
@@ -1521,7 +1521,7 @@
           "feedCaption": "AML Team"
         },
         "year": {
-          "title": "FCC Risk Appetite Statement",
+          "title": "Risk Appetite Statement",
           "metricHeader": "# risk appetite breaches",
           "hero": {
             "kind": "authored",

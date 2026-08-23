@@ -32,35 +32,37 @@ function scanForOverruns(): { total: number; overruns: string[] } {
   return { total, overruns: [...seen].sort() };
 }
 
+interface ScanResult {
+  total: number;
+  overruns: string[];
+  scanNumber: number; // diagnostic — which of the scheduled scans produced this, so a wrong result is traceable rather than mysterious
+  elapsedMs: number;
+}
+
 export function OverflowSentinel(): JSX.Element | null {
   const active = isFitCheckActive();
   const { horizon } = useSessionState();
-  const [result, setResult] = useState<{ total: number; overruns: string[] } | null>(null);
+  const [result, setResult] = useState<ScanResult | null>(null);
 
   useEffect(() => {
     if (!active) return;
     let cancelled = false;
     const timers: ReturnType<typeof setTimeout>[] = [];
+    const mountedAt = performance.now();
 
-    // A single scan, however carefully timed, is a race — document.fonts
-    // .ready resolving doesn't guarantee the LAST layout-affecting reflow
-    // has already happened (confirmed live, 22 Aug 2026: elements measured
-    // as genuinely fitting via DevTools moments after load were still
-    // being reported as overruns by a scan that had run too early and
-    // never re-checked). Rather than guess at a longer fixed delay — which
-    // just relocates the same race rather than removing it — scan
-    // repeatedly over a settling window and keep only the last result,
-    // which reflects whatever the page has actually settled into.
-    const schedule = (delayMs: number) => {
+    const schedule = (delayMs: number, scanNumber: number) => {
       const t = setTimeout(() => {
-        if (!cancelled) setResult(scanForOverruns());
+        if (!cancelled) {
+          const scan = scanForOverruns();
+          setResult({ ...scan, scanNumber, elapsedMs: Math.round(performance.now() - mountedAt) });
+        }
       }, delayMs);
       timers.push(t);
     };
 
     document.fonts.ready.then(() => {
       if (cancelled) return;
-      [0, 150, 400, 800, 1500].forEach(schedule);
+      [0, 150, 400, 800, 1500].forEach((delay, i) => schedule(delay, i + 1));
     });
 
     return () => {
@@ -73,7 +75,15 @@ export function OverflowSentinel(): JSX.Element | null {
     if (!active) return;
     const root = document.querySelector('.canvas-root');
     if (!root) return;
-    const ro = new ResizeObserver(() => setResult(scanForOverruns()));
+    let firstCallback = true; // ResizeObserver.observe() always fires once immediately with the current size, even though nothing has resized — that mandatory initial callback is not a real resize and must not overwrite the settled scan above with an early, likely-unsettled one.
+    const ro = new ResizeObserver(() => {
+      if (firstCallback) {
+        firstCallback = false;
+        return;
+      }
+      const scan = scanForOverruns();
+      setResult({ ...scan, scanNumber: -1, elapsedMs: -1 });
+    });
     ro.observe(root);
     return () => ro.disconnect();
   }, [active]);
@@ -82,12 +92,17 @@ export function OverflowSentinel(): JSX.Element | null {
 
   const line =
     result.overruns.length === 0
-      ? `fit check: ${result.total} elements, no overruns`
-      : `fit check: ${result.total} elements, ${result.overruns.length} overrun(s): ${result.overruns.join(', ')}`;
+      ? `fit check: ${result.total} elements, no overruns [scan ${result.scanNumber}, ${result.elapsedMs}ms]`
+      : `fit check: ${result.total} elements, ${result.overruns.length} overrun(s): ${result.overruns.join(', ')} [scan ${result.scanNumber}, ${result.elapsedMs}ms]`;
 
   return (
     <div
       role="status"
+      onClick={() => {
+        const scan = scanForOverruns();
+        setResult({ ...scan, scanNumber: 0, elapsedMs: -1 }); // scan 0 = manual, click-triggered
+      }}
+      title="Click to re-scan immediately"
       style={{
         position: 'absolute',
         bottom: 0,
@@ -99,6 +114,7 @@ export function OverflowSentinel(): JSX.Element | null {
         color: result.overruns.length === 0 ? 'var(--status-green)' : 'var(--status-red)',
         fontWeight: 'var(--weight-semibold)',
         font: '12px monospace',
+        cursor: 'pointer',
         zIndex: 100,
       }}
     >

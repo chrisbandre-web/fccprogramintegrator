@@ -15,9 +15,9 @@ function isFitCheckActive(): boolean {
 
 const TRUNCATABLE_SELECTOR = [
   '.register-row__source',
-  '.register-row__metric',
+  '.register-row__metric > span', // the truncating inner span, not the centering outer flex box
   '.register-row__title',
-  '[data-element-id] > span',
+  '[data-element-id] > span:not(.register-row__metric)', // exclude the outer metric box — it's covered above, and it's a direct child too, so this catch-all would otherwise measure the wrong (non-truncating) element
 ].join(',');
 
 function scanForOverruns(): { total: number; overruns: string[] } {

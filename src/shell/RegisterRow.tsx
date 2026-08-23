@@ -16,7 +16,11 @@ export function RegisterRow({ id, content }: { id: string; content: ElementConte
       <span className="register-row__hero">
         {hero && <HeroValue value={hero.value} unit={hero.unit} size="register" />}
       </span>
-      {content.metricHeader && <span className="register-row__metric">{content.metricHeader}</span>}
+      {content.metricHeader && (
+        <span className="register-row__metric">
+          <span>{content.metricHeader}</span>
+        </span>
+      )}
       <span className="register-row__trend">{trend && <TrendGlyph value={trend} />}</span>
     </div>
   );

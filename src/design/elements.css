@@ -158,14 +158,30 @@
    into its own cell (rather than one flowing line-2 string) precisely so
    this centering is possible independent of the source's length.
    Fixed from a live screenshot, 22 Aug 2026 (Chris). */
+/* Metric header — centered under the hero column when it fits, cleanly
+   end-truncated when it doesn't. text-align: center on overflowing text
+   clips from BOTH edges (the browser still tries to center text wider
+   than its box, pushing half the excess past each side) rather than
+   truncating from one end — a real CSS trap, distinct from anything
+   about the hero's own position. Fixed with the standard pattern: an
+   outer flex box centers an inner span when the span is narrower than
+   the box; the inner span's own max-width: 100% + ellipsis takes over
+   with normal (single-sided, left-to-right) truncation once it isn't.
+   Fixed from a live screenshot, 22 Aug 2026 (Chris). */
 .register-row__metric {
   grid-column: 3;
   grid-row: 2;
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.register-row__metric > span {
   font: var(--weight-regular) var(--type-caption) / var(--leading-tight) var(--font-family);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .register-row__hero {

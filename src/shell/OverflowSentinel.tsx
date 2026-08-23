@@ -13,34 +13,28 @@ function isFitCheckActive(): boolean {
   return new URLSearchParams(window.location.search).get('fit-check') === '1';
 }
 
-const TRUNCATABLE_SELECTOR = [
-  '.register-row__source',
-  '.register-row__metric > span', // the truncating inner span, not the centering outer flex box
-  '.register-row__title',
-  '[data-element-id] > span:not(.register-row__metric)', // exclude the outer metric box — it's covered above, and it's a direct child too, so this catch-all would otherwise measure the wrong (non-truncating) element
-].join(',');
+// TRUNCATABLE_SELECTOR was previously a broad "any direct child span"
+// catch-all, which is how it ended up scanning register-row__trend — a
+// span containing TrendGlyph's rotated CSS-border triangle, not text.
+// Rotating a shape enlarges its visual (paint) footprint beyond its
+// layout box (a 14px shape rotated 45deg has a diagonal extent nearer
+// 20px), and scrollWidth picks up on that rotated extent even though
+// nothing is actually being clipped or is visually wrong. That's a real,
+// deterministic, always-reproducible CSS quirk — not a bug in the
+// glyph, and not something scrollWidth/clientWidth can distinguish from
+// genuine text overflow. The fix is narrower scope, not a special case:
+// only scan elements explicitly marked as truncatable text (.truncate-text,
+// applied at each such span in RegisterRow.tsx and ElementTile.tsx),
+// never a structural catch-all that can't tell text from a graphical glyph.
+// Found from a live console dump, 22 Aug 2026 (Chris).
+const TRUNCATABLE_SELECTOR = '.truncate-text';
 
 function scanForOverruns(): { total: number; overruns: string[] } {
   const seen = new Set<string>();
   document.querySelectorAll<HTMLElement>(TRUNCATABLE_SELECTOR).forEach((el) => {
     if (el.scrollWidth > el.clientWidth + 1) {
       const owner = el.closest<HTMLElement>('[data-element-id]');
-      const id = owner?.getAttribute('data-element-id') ?? '(unattributed)';
-      seen.add(id);
-      // Diagnostic — which specific element and selector actually
-      // triggered this, since the owner id alone hasn't been enough to
-      // find the real cause. Left in deliberately for the next check.
-      // eslint-disable-next-line no-console
-      console.log('[fit-check overrun]', {
-        ownerId: id,
-        className: el.className,
-        tagName: el.tagName,
-        text: el.textContent,
-        scrollWidth: el.scrollWidth,
-        clientWidth: el.clientWidth,
-        computedDisplay: getComputedStyle(el).display,
-        computedWidth: getComputedStyle(el).width,
-      });
+      seen.add(owner?.getAttribute('data-element-id') ?? '(unattributed)');
     }
   });
   const total = document.querySelectorAll('[data-element-id]').length;

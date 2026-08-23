@@ -11,14 +11,14 @@ export function RegisterRow({ id, content }: { id: string; content: ElementConte
   return (
     <div className="register-row" data-status="inactive" data-element-id={id}>
       <span className="register-row__mark">{health && <HealthMark value={health} />}</span>
-      <span className="register-row__title">{content.title}</span>
-      <span className="register-row__source">{content.feedCaption}</span>
+      <span className="register-row__title truncate-text">{content.title}</span>
+      <span className="register-row__source truncate-text">{content.feedCaption}</span>
       <span className="register-row__hero">
         {hero && <HeroValue value={hero.value} unit={hero.unit} size="register" />}
       </span>
       {content.metricHeader && (
         <span className="register-row__metric">
-          <span>{content.metricHeader}</span>
+          <span className="truncate-text">{content.metricHeader}</span>
         </span>
       )}
       <span className="register-row__trend">{trend && <TrendGlyph value={trend} />}</span>

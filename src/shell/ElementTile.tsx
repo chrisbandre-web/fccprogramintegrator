@@ -51,11 +51,11 @@ export function ElementTile({
 
   const inner = (
     <>
-      <span style={{ font: 'var(--weight-semibold) var(--type-tile-title) / var(--leading-tight) var(--font-family)', color: 'var(--ink-primary)', ...truncate }}>
+      <span className="truncate-text" style={{ font: 'var(--weight-semibold) var(--type-tile-title) / var(--leading-tight) var(--font-family)', color: 'var(--ink-primary)', ...truncate }}>
         {content.title}
       </span>
       {content.metricHeader && (
-        <span style={{ font: 'var(--weight-regular) var(--type-metric-header) / var(--leading-tight) var(--font-family)', color: bodyInk, ...truncate }}>
+        <span className="truncate-text" style={{ font: 'var(--weight-regular) var(--type-metric-header) / var(--leading-tight) var(--font-family)', color: bodyInk, ...truncate }}>
           {content.metricHeader}
         </span>
       )}
@@ -64,7 +64,7 @@ export function ElementTile({
         {trend && <TrendGlyph value={trend} />}
         {health && <HealthMark value={health} />}
       </div>
-      <span style={{ font: 'var(--weight-regular) var(--type-caption) / var(--leading-tight) var(--font-family)', color: bodyInk, ...truncate }}>
+      <span className="truncate-text" style={{ font: 'var(--weight-regular) var(--type-caption) / var(--leading-tight) var(--font-family)', color: bodyInk, ...truncate }}>
         {content.feedCaption}
       </span>
     </>

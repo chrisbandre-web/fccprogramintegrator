@@ -25,7 +25,22 @@ function scanForOverruns(): { total: number; overruns: string[] } {
   document.querySelectorAll<HTMLElement>(TRUNCATABLE_SELECTOR).forEach((el) => {
     if (el.scrollWidth > el.clientWidth + 1) {
       const owner = el.closest<HTMLElement>('[data-element-id]');
-      seen.add(owner?.getAttribute('data-element-id') ?? '(unattributed)');
+      const id = owner?.getAttribute('data-element-id') ?? '(unattributed)';
+      seen.add(id);
+      // Diagnostic — which specific element and selector actually
+      // triggered this, since the owner id alone hasn't been enough to
+      // find the real cause. Left in deliberately for the next check.
+      // eslint-disable-next-line no-console
+      console.log('[fit-check overrun]', {
+        ownerId: id,
+        className: el.className,
+        tagName: el.tagName,
+        text: el.textContent,
+        scrollWidth: el.scrollWidth,
+        clientWidth: el.clientWidth,
+        computedDisplay: getComputedStyle(el).display,
+        computedWidth: getComputedStyle(el).width,
+      });
     }
   });
   const total = document.querySelectorAll('[data-element-id]').length;

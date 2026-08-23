@@ -26,6 +26,8 @@
   position: relative; /* anchors OverflowSentinel's absolute status line */
   width: var(--canvas-width);
   height: var(--canvas-height);
+  flex-shrink: 0; /* CRITICAL — without this, flexbox's default shrink lets the browser squeeze this box to fit a narrower viewport BEFORE transform: scale() ever runs, compounding two shrink effects into one. Confirmed live, 22 Aug 2026 (Chris): measured width / canvas-scale exactly equalled window.innerWidth, not 1920 — proof the box was being pre-shrunk to the window rather than staying at its true fixed size for the transform to scale down uniformly. */
+  flex-grow: 0; /* same guard against the opposite case — a very wide/short window must not stretch this box past 1920 either */
   overflow: hidden; /* the structural guarantee */
   transform: scale(var(--canvas-scale, 1));
   transform-origin: center;

@@ -381,6 +381,16 @@ async function checkJurisdictionTable(): Promise<void> {
   }
 }
 
+async function checkFixtureDdGate(): Promise<void> {
+  try {
+    execSync('node --experimental-strip-types scripts/generate-fixture.ts', { cwd: ROOT, stdio: 'pipe' });
+    record('TAD-19', 'The twenty-two DD-checks of DD §3 (fixture population targets, structural integrity, narrative legibility)', true, 'generate-fixture.ts exited 0 -- all binary DD-checks passed (DD-9 is report-only).');
+  } catch (e) {
+    const out = e instanceof Error && 'stdout' in e ? String((e as { stdout: Buffer }).stdout) : String(e);
+    record('TAD-19', 'The twenty-two DD-checks of DD §3 (fixture population targets, structural integrity, narrative legibility)', false, out.slice(-3000));
+  }
+}
+
 // --- Build itself -----------------------------------------------------------
 
 function checkBuild(): void {
@@ -407,23 +417,11 @@ await checkWorkedExamples();
 await checkBandBoundaries();
 await checkPepFloorNeverCeiling();
 await checkJurisdictionTable();
+await checkFixtureDdGate();
 checkTypecheck();
 checkLint();
 checkVitest();
 checkBuild();
-
-// TODO — phase 2, remaining (TAD §L.3's fixture group):
-//   TAD-19  the twenty-two DD-checks of DD §3, reported individually;
-//           binary ones fail the run, DD-9 reports only. Added once
-//           generate-fixture.ts and config/fixture.config.ts exist.
-//
-// Corrected 24 Aug 2026 (phase 2 engineer): this comment previously read
-// "TAD-1..3 engine unit checks (band boundaries, PEP override, route)" and
-// "TAD-10 jurisdiction table" — those numbers don't match §L.3's own
-// numbering, where 1-3 are the structure/import-restriction checks and the
-// jurisdiction table is explicitly cross-referenced elsewhere in the TAD
-// (§H.4: "both lists happen to have a jurisdiction item at position 15")
-// as TAD-15, not TAD-10. The checks below use §L.3's actual numbers.
 
 console.log('\n=== npm run check ===\n');
 let allPass = true;

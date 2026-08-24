@@ -137,6 +137,51 @@ function checkNoInkSecondaryUnderScrim(): void {
   );
 }
 
+// --- TAD-2/3 (§L.3) — the engine is provable headless, and nothing under
+// shell/modules reaches into the engine's internal reference tables -------
+
+function checkNoShellImportOfEngineReference(): void {
+  const files = walk(join(ROOT, 'src', 'shell'), ['.ts', '.tsx']).concat(
+    walk(join(ROOT, 'src', 'modules'), ['.ts', '.tsx']),
+  );
+  const offenders: string[] = [];
+  for (const f of files) {
+    const content = readFileSync(f, 'utf-8');
+    const importLines = content.match(/^import[^\n;]*from\s+['"][^'"]*['"];?/gm) ?? [];
+    for (const line of importLines) {
+      if (/engine\/reference/.test(line)) offenders.push(`${f.replace(ROOT + '/', '')}: ${line.trim()}`);
+    }
+  }
+  record(
+    'TAD-2',
+    'No file under src/shell/ or src/modules/ imports anything from src/engine/reference/',
+    offenders.length === 0,
+    offenders.join('; '),
+  );
+}
+
+function checkEngineIsHeadless(): void {
+  const files = walk(join(ROOT, 'src', 'engine'), ['.ts', '.tsx']);
+  const offenders: string[] = [];
+  for (const f of files) {
+    const content = readFileSync(f, 'utf-8');
+    const importLines = content.match(/^import[^\n;]*from\s+['"][^'"]*['"];?/gm) ?? [];
+    for (const line of importLines) {
+      const specifierMatch = line.match(/from\s+['"]([^'"]*)['"]/);
+      const specifier = specifierMatch?.[1] ?? '';
+      const isReact = specifier === 'react' || specifier.startsWith('react/') || specifier.startsWith('react-dom');
+      const reachesUi = /\/(shell|modules|design)\//.test(specifier) || /^\.\.\/(shell|modules|design)\//.test(specifier);
+      if (isReact || reachesUi) offenders.push(`${f.replace(ROOT + '/', '')}: ${line.trim()}`);
+    }
+  }
+  record(
+    'TAD-3',
+    'No file under src/engine/ imports React or anything from src/shell/, src/modules/ or src/design/',
+    offenders.length === 0,
+    offenders.join('; '),
+  );
+}
+
 // --- Mark/glyph shape-color coupling (Architect's note, 23 Aug 2026) ------
 
 function checkHealthMarkIsOnlyStatusColorReference(): void {
@@ -229,6 +274,113 @@ function checkDeclarationGateConditions(): void {
   }
 }
 
+// --- TAD-12..15 (§L.3) — engine, test-shaped. §D.2.5: "eleven of twelve is
+// a failure" — checkWorkedExamples fails the whole run on any mismatch. --
+
+async function checkWorkedExamples(): Promise<void> {
+  try {
+    const { score } = (await import('../src/engine/score.ts')) as typeof import('../src/engine/score.ts');
+    const { WORKED_EXAMPLES } = (await import('../src/engine/workedExamples.ts')) as typeof import('../src/engine/workedExamples.ts');
+    const failures: string[] = [];
+    for (const ex of WORKED_EXAMPLES) {
+      const result = score(ex.customer);
+      const points = [result.points.entityType, result.points.industry, result.points.product, result.points.jurisdiction, result.points.tmAlerts];
+      const pointsOk = JSON.stringify(points) === JSON.stringify(ex.expectedPoints);
+      const scoreOk = result.score === ex.expectedScore;
+      const ratingOk = result.rating === ex.expectedRating;
+      const floorRaised = result.route === 'PEP escalation';
+      const overrideOk = (ex.expectedOverride !== null) === floorRaised;
+      if (!pointsOk || !scoreOk || !ratingOk || !overrideOk) {
+        failures.push(
+          `#${ex.id}: points=${JSON.stringify(points)} (want ${JSON.stringify(ex.expectedPoints)}) ` +
+            `score=${result.score} (want ${ex.expectedScore}) rating=${result.rating} (want ${ex.expectedRating}) route=${result.route}`,
+        );
+      }
+    }
+    record(
+      'TAD-12',
+      `All twelve worked examples reproduce exactly (CRRM v2.3 §7)`,
+      failures.length === 0,
+      failures.length === 0 ? '' : `${failures.length}/${WORKED_EXAMPLES.length} failed — ${failures.join(' | ')}`,
+    );
+  } catch (e) {
+    record('TAD-12', 'All twelve worked examples reproduce exactly (CRRM v2.3 §7)', false, String(e));
+  }
+}
+
+async function checkBandBoundaries(): Promise<void> {
+  try {
+    const { ratingFromScore } = (await import('../src/engine/methodology.ts')) as typeof import('../src/engine/methodology.ts');
+    const cases: [number, string][] = [
+      [2.40, 'Low'],
+      [2.41, 'Medium'],
+      [3.40, 'Medium'],
+      [3.41, 'High'],
+      [4.20, 'High'],
+      [4.21, 'Unacceptable'],
+      [4.40, 'Unacceptable'],
+    ];
+    const offenders = cases
+      .map(([s, want]) => [s, want, ratingFromScore(s)] as const)
+      .filter(([, want, got]) => got !== want)
+      .map(([s, want, got]) => `score ${s}: got ${got}, want ${want}`);
+    record(
+      'TAD-13',
+      'Band boundaries hold at 2.40 / 3.40 / 4.20 / 4.40 (CRRM v2.3 §5, strict inequalities)',
+      offenders.length === 0,
+      offenders.join('; '),
+    );
+  } catch (e) {
+    record('TAD-13', 'Band boundaries hold at 2.40 / 3.40 / 4.20 / 4.40', false, String(e));
+  }
+}
+
+async function checkPepFloorNeverCeiling(): Promise<void> {
+  try {
+    const { applyPepFloor } = (await import('../src/engine/methodology.ts')) as typeof import('../src/engine/methodology.ts');
+    const offenders: string[] = [];
+    // Floor raises a lower scored rating.
+    const raised = applyPepFloor('Low', 'Domestic PEP');
+    if (raised.rating !== 'Medium' || raised.route !== 'PEP escalation') offenders.push(`Low + Domestic PEP -> ${JSON.stringify(raised)}, want Medium/PEP escalation`);
+    // Floor is silent when the scored rating already clears it.
+    const silent = applyPepFloor('High', 'Domestic PEP');
+    if (silent.rating !== 'High' || silent.route !== 'on score') offenders.push(`High + Domestic PEP -> ${JSON.stringify(silent)}, want High/on score`);
+    // The floor must NEVER cap a higher rating down — the critical
+    // "never a ceiling" property: Unacceptable stays Unacceptable even
+    // against a Senior Foreign PEP's High floor.
+    const neverCeiling = applyPepFloor('Unacceptable', 'Senior Foreign PEP');
+    if (neverCeiling.rating !== 'Unacceptable' || neverCeiling.route !== 'on score') {
+      offenders.push(`Unacceptable + Senior Foreign PEP -> ${JSON.stringify(neverCeiling)}, want Unacceptable/on score (the floor must never cap a rating down)`);
+    }
+    const none = applyPepFloor('Low', 'None');
+    if (none.rating !== 'Low' || none.route !== 'on score') offenders.push(`Low + None -> ${JSON.stringify(none)}, want Low/on score`);
+    record('TAD-14', 'The PEP override is a floor and never a ceiling (CRRM v2.3 §6)', offenders.length === 0, offenders.join('; '));
+  } catch (e) {
+    record('TAD-14', 'The PEP override is a floor and never a ceiling', false, String(e));
+  }
+}
+
+async function checkJurisdictionTable(): Promise<void> {
+  // The generated module runs its own two startup assertions (§C.4,
+  // §D.2.3) as top-level code the moment it's imported — 177 rows exactly,
+  // and exactly one Low row which is the United States, each with the
+  // derived band cross-checked against the source's own asserted band. A
+  // successful import therefore already proves this check; this function
+  // exists to surface that as a labelled pass/fail line rather than a
+  // silent import.
+  try {
+    await import('../src/engine/reference/jurisdictions.ts');
+    record('TAD-15', "The jurisdiction table's derived bands match its asserted column on all 177 rows, and exactly one row is Low (United States)", true);
+  } catch (e) {
+    record(
+      'TAD-15',
+      "The jurisdiction table's derived bands match its asserted column on all 177 rows, and exactly one row is Low (United States)",
+      false,
+      String(e),
+    );
+  }
+}
+
 // --- Build itself -----------------------------------------------------------
 
 function checkBuild(): void {
@@ -246,19 +398,32 @@ function checkBuild(): void {
 checkNoRawColorLiterals();
 checkNoRawPxOutsideTokens();
 checkNoInkSecondaryUnderScrim();
+checkNoShellImportOfEngineReference();
+checkEngineIsHeadless();
 checkHealthMarkIsOnlyStatusColorReference();
 checkGeneratedFileHeader();
 checkDeclarationGateConditions();
+await checkWorkedExamples();
+await checkBandBoundaries();
+await checkPepFloorNeverCeiling();
+await checkJurisdictionTable();
 checkTypecheck();
 checkLint();
 checkVitest();
 checkBuild();
 
-// TODO — added once the engine exists (phase 2, TAD §L.3):
-//   TAD-1..3   engine unit checks (band boundaries, PEP override, route)
-//   TAD-10     jurisdiction table: 177 rows, exactly one Low (US)
-//   TAD-12..16 the twelve worked examples reproduce exactly (binary gate)
-//   TAD-18..19 fixture population tolerances (checks 4-9)
+// TODO — phase 2, remaining (TAD §L.3's fixture group):
+//   TAD-19  the twenty-two DD-checks of DD §3, reported individually;
+//           binary ones fail the run, DD-9 reports only. Added once
+//           generate-fixture.ts and config/fixture.config.ts exist.
+//
+// Corrected 24 Aug 2026 (phase 2 engineer): this comment previously read
+// "TAD-1..3 engine unit checks (band boundaries, PEP override, route)" and
+// "TAD-10 jurisdiction table" — those numbers don't match §L.3's own
+// numbering, where 1-3 are the structure/import-restriction checks and the
+// jurisdiction table is explicitly cross-referenced elsewhere in the TAD
+// (§H.4: "both lists happen to have a jurisdiction item at position 15")
+// as TAD-15, not TAD-10. The checks below use §L.3's actual numbers.
 
 console.log('\n=== npm run check ===\n');
 let allPass = true;

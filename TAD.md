@@ -1,6 +1,6 @@
 # FCC Program Integrator
 ## Technical Architecture Document (TAD)
-*Version: **1.3 · APPROVED**, originally 21 August 2026, amended 22 and 23 August 2026 during construction · Branch: **React Web Application** · Stack: React 18 + Vite + TypeScript (strict), hosted on Vercel, push-to-deploy from `chrisbandre-web/fccprogramintegrator` · Status: **Released for construction***
+*Version: **1.4 · APPROVED**, originally 21 August 2026, amended 22, 23 and 24 August 2026 during construction · Branch: **React Web Application** · Stack: React 18 + Vite + TypeScript (strict), hosted on Vercel, push-to-deploy from `chrisbandre-web/fccprogramintegrator` · Status: **Released for construction***
 *Build: FCC Program Governance Dashboard (the seed build)*
 
 > **Canonical position.** This document is the contract the Author builds every component against and the structural reference the Implementor assembles and deploys to. It is drafted from the complete Design Document v0.9.2 (20 August 2026) and the canonical external inputs listed there. Where this document needs domain logic, it **references the canonical input by section**; it does not restate it. This TAD is canonical-and-living and **lives in the repository as `TAD.md`** (Playbook: Flow and canonical state), so amendments and code travel together and "does the TAD match the code" is checkable in one place. Where this TAD and an upstream canonical document conflict, the conflict is escalated to the Coordinator and resolved by amending the upstream document — never by a silent deviation here (amend-upstream rule).
@@ -68,6 +68,7 @@ fccprogramintegrator/
     Tile_Content_Appendix_B_MONTH_21AUG26.xlsx      committed, canonical, never edited in-repo
     Tile_Content_Appendix_B_QUARTER_21AUG26.xlsx
     Tile_Content_Appendix_B_YEAR_21AUG26.xlsx
+    Country_Risk_Ratings_20AUG26.docx               committed, canonical, never edited in-repo (§B.2 amendment, phase 2)
   scripts/
     generate-declarations.ts    workbooks  -> src/generated/declarations.generated.json
     generate-jurisdictions.ts   the 177-row jurisdiction table -> src/engine/reference/jurisdictions.ts (§B.2 amendment, phase 2 work)
@@ -1452,6 +1453,7 @@ That split is what keeps the shell generic: the shell provides storage typed `un
 
 | Version | Date | Change |
 |---|---|---|
+| **1.4** | **24 Aug 2026** | **Construction amendment, phase 2.** Closes a placement gap §D.1.1b left open: §B.2's repository tree listed the three Appendix B workbooks under `content/` but never added `Country_Risk_Ratings_20AUG26.docx`, though §D.1.1b names it as `generate-jurisdictions.ts`'s dependency without a path. Committed to `content/Country_Risk_Ratings_20AUG26.docx`, alongside its sibling canonical sources, per Coordinator direction. No other architectural change. |
 | 0.1 | 21 Aug 2026 | First full draft from DD v0.9.2. Twenty-two flags closed in §F; three items raised — Recharts as amend-upstream, the register line-2 overrun, and the missing `--register-title-width` token. |
 | 0.2 | 21 Aug 2026 | Coordinator's revised Appendix B workbooks incorporated, closing the line-2 overrun at source. Designer's note accepted: `OverflowSentinel` runs against the deployed board, not development only. §L.4 added — every value and algorithm an Author would otherwise have to decide. |
 | 0.3 | 21 Aug 2026 | All five findings of the Author-readiness Reviewer pass closed. Jurisdiction band vocabulary now a direct comparison with no translation step, following the Coordinator's correction at source in CRRM v2.3; character budgets split by presentation; the composition axis label given an owner and a phase; `DD-n` / `TAD-n` check labels; an incorrect claim about the `QA` cell withdrawn and recorded. |

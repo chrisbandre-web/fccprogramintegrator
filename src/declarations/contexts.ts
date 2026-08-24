@@ -29,11 +29,13 @@ export const boardContext: ContextDeclaration = {
     },
     {
       kind: 'health-and-trend',
-      // Corrected 23 Aug 2026 (Design System owner's finding, from the
-      // deployed board): the authorised forms are "Control Effectiveness
-      // Risk" (preferred) or "Effectiveness Risk" (short) — "Control Risk"
-      // is neither, and drops the word the encoding actually turns on.
-      label: 'Control Effectiveness Risk',
+      // Reverted 23 Aug 2026 (Chris, second pass): "Control Risk" is the
+      // final, consistent label — the parallelism with "Business Risk"
+      // (both two words) was the deciding argument, and the Design System
+      // owner deferred to it ("your call and I'll take it," accurate
+      // either way). This supersedes the "Control Effectiveness Risk"
+      // change made earlier the same day from the owner's first note.
+      label: 'Control Risk',
       markMeans:
         'how close the control is to allowing the risk exposure it was specifically designed to prevent',
       arrowMeans: 'the direction the metric is moving',

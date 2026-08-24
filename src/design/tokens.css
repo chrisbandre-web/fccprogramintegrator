@@ -35,10 +35,11 @@
   --ink-tertiary:      #6E6A63;   /*  5.11:1 on surface — captions, band labels, legend   */
 
   /* !! BINDING RULE — INACTIVE ELEMENTS USE PRIMARY INK ONLY.
-     Secondary ink measures 3.75:1 through the scrim and FAILS AA. On any
-     scrimmed element, the metric header and feed caption step up to
-     --ink-primary, which measures 5.95:1 through the scrim. This is not a
-     preference; it is the only combination that clears the floor. */
+     Secondary ink measures 4.14:1 through the scrim (at 0.28) and still FAILS
+     AA (needs 4.5). On any scrimmed element, the metric header and feed
+     caption step up to --ink-primary, which measures 6.75:1 through the
+     scrim. This is not a preference; it is the only combination that
+     clears the floor. */
 
   /* ---------------------------------------------------------------------------
      3. ENCODING 1 — MODULE STATUS  (live / inactive)
@@ -50,15 +51,20 @@
   --live-fill-edge:    #5E93B2;
   /* ink-primary on live-fill = 7.85:1 */
 
-  --scrim-opacity:     0.32;      /* CONFIRMED at phase 1 exit — held at 0.32, not raised to the
-                                      0.40 the Design System owner recommended after the whole-board
-                                      screenshot review (23 Aug 2026): at 0.40, status-amber and
-                                      status-green both drop below the 3:1 floor on a scrimmed mark
-                                      (2.77 / 2.72) — exactly what E2 warned a heavier veil would do.
-                                      The caption/ink side of that recommendation holds fine
-                                      (ink-primary 4.55:1 at 0.40); it's the marks that don't.
-                                      Open with the Design System owner, not resolved unilaterally. */
-  --scrim:             rgba(244, 243, 239, 0.32);   /* the ground, veiling. Never a hue. */
+  --scrim-opacity:     0.28;      /* CONFIRMED, 23 Aug 2026, second pass — lowered from 0.32.
+                                      The Design System owner's 0.40 recommendation would have
+                                      pushed status-amber and status-green below the 3:1 floor
+                                      (2.77 / 2.72); the direction that actually needed testing was
+                                      lighter, not heavier, since contrast improves as the veil
+                                      lightens (no floor to trade against on that side). At 0.28:
+                                      primary ink 6.75:1, red mark 4.10:1, amber mark 3.55:1, green
+                                      mark 3.49:1 — a real step down from 0.32, clear of the 3:1
+                                      floor by enough margin that E2 (marks defensible on shape
+                                      redundancy rather than the contrast number) is retired; the
+                                      marks now hold on contrast alone. 0.24 remains available if
+                                      0.28 still reads heavy; below that wants another screenshot
+                                      first. */
+  --scrim:             rgba(244, 243, 239, 0.28);   /* the ground, veiling. Never a hue. */
   /* A scrim with its own hue would shift red, amber and green by different
      perceptual amounts and break Rule C's graduation on 24 of 26 elements. */
   /* Scrim and fill are mutually exclusive — no element is ever both. Fill
@@ -69,15 +75,18 @@
   /* ---------------------------------------------------------------------------
      4. ENCODING 2 — PROGRAM RISK  (bounded mark; never a surface)
      Two subjects, one ramp (DD v0.7 §5): Business Risk on the two tiles,
-     Control Effectiveness Risk on the 24 register rows.
+     Control Risk on the 24 register rows. [Legend label finalized as
+     "Control Risk" over "Control Effectiveness Risk", 23 Aug 2026 —
+     Chris, parallelism with "Business Risk"; Design System owner
+     deferred, either form accurate.]
      Rule C: saturation graduated by severity. HSL saturation, verified:
      red 0.734 > amber 0.575 > green 0.180. A healthy board is quiet by
      construction, not by restraint.
      --------------------------------------------------------------------------- */
 
-  --status-red:        #A32219;   /* surface 7.12 · scrimmed 3.78 · on live-fill 3.38 */
-  --status-amber:      #73531F;   /* surface 6.68 · scrimmed 3.27 · on live-fill 3.17 */
-  --status-green:      #4E5F42;   /* surface 6.56 · scrimmed 3.21 · on live-fill 3.11 */
+  --status-red:        #A32219;   /* surface 7.12 · scrimmed 4.10 (at 0.28) · on live-fill 3.38 */
+  --status-amber:      #73531F;   /* surface 6.68 · scrimmed 3.55 (at 0.28) · on live-fill 3.17 */
+  --status-green:      #4E5F42;   /* surface 6.56 · scrimmed 3.49 (at 0.28) · on live-fill 3.11 */
 
   --mark-size:         14px;      /* 10.5 rendered — a Harvey ball, see §5 of the spec */
   --mark-stroke:       1.75px;

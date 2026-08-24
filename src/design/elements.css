@@ -6,12 +6,6 @@
    local provisional override that used to live here is gone. */
 
 /* ---------------------------------------------------------------------------
-   ScrimLayer (§D.5.22) — the one place the scrim exists.
-   Binding rule: metric header and caption set to PRIMARY ink through the
-   scrim (secondary fails AA at 3.75:1). Enforced here, in the one class,
-   rather than trusted to 24 call sites.
-   --------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------
    ScrimLayer (§D.5.22, Design System Spec §8.1) — the one place the scrim
    exists. Applies to INACTIVE elements (both tiles and register rows), not
    the live tile — corrected 23 Aug 2026 after the Design System owner's
@@ -23,16 +17,20 @@
    BEFORE the element's real children by default, and this class had
    additionally lifted children to position:relative to guarantee they sat
    above it — meaning nothing was ever actually being veiled; only the
-   background was. Confirmed by reproducing the token file's own documented
-   scrim contrast figures exactly (3.75 / 3.79 / 3.26 / 3.20) only when both
-   the mark/ink color AND the background are independently blended toward
-   ground at the scrim opacity — a foreground effect, not a background-only
-   one. ::after paints AFTER the element's real children by default, which
-   is what makes this correct without the position trick.
+   background was. Confirmed at the time by reproducing the token file's
+   then-current (0.32-opacity) scrim contrast figures exactly
+   (3.75 / 3.79 / 3.26 / 3.20) only when both the mark/ink color AND the
+   background are independently blended toward ground at the scrim
+   opacity — a foreground effect, not a background-only one. ::after paints
+   AFTER the element's real children by default, which is what makes this
+   correct without the position trick. (Opacity later moved to 0.28, second
+   pass, same date — see fcc-tokens.css for current figures.)
 
    Binding rule: metric header and caption set to PRIMARY ink through the
-   scrim (secondary fails AA at 3.75:1). Enforced here, in the one class,
-   rather than trusted to 24 call sites. */
+   scrim (secondary fails AA at 4.14:1 at the current 0.28 opacity — see
+   fcc-tokens.css for the authoritative, current numbers). Enforced here,
+   in the one class, rather than trusted to 24 call sites.
+   --------------------------------------------------------------------------- */
 .scrim {
   position: relative;
   color: var(--ink-primary);

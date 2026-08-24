@@ -114,12 +114,13 @@ export function OverflowSentinel(): JSX.Element | null {
       title="Click to re-scan immediately"
       style={{
         position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
+        bottom: 4, // was 0 — the Design System owner reported the line clipping the viewport edge (23 Aug 2026); a small offset gives it breathing room against whatever browser-chrome/rounding effect was eating the flush-bottom edge. Dev-only overlay, not product surface — a pragmatic small fix, not one that needed root-causing further.
+        left: 4,
+        right: 4,
         padding: '4px 8px',
         background: 'var(--surface)',
-        borderTop: '1px solid var(--surface-edge)',
+        border: '1px solid var(--surface-edge)',
+        borderRadius: 4,
         // Deliberately NOT --status-red/green — those are HealthMark's
         // semantic tokens, and this is a dev-only diagnostic overlay, not
         // product surface. npm run check asserts HealthMark is the ONLY

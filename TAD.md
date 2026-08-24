@@ -1,6 +1,6 @@
 # FCC Program Integrator
 ## Technical Architecture Document (TAD)
-*Version: **1.2 · APPROVED**, originally 21 August 2026, amended 22 August 2026 during construction · Branch: **React Web Application** · Stack: React 18 + Vite + TypeScript (strict), hosted on Vercel, push-to-deploy from `chrisbandre-web/fccprogramintegrator` · Status: **Released for construction***
+*Version: **1.3 · APPROVED**, originally 21 August 2026, amended 22 and 23 August 2026 during construction · Branch: **React Web Application** · Stack: React 18 + Vite + TypeScript (strict), hosted on Vercel, push-to-deploy from `chrisbandre-web/fccprogramintegrator` · Status: **Released for construction***
 *Build: FCC Program Governance Dashboard (the seed build)*
 
 > **Canonical position.** This document is the contract the Author builds every component against and the structural reference the Implementor assembles and deploys to. It is drafted from the complete Design Document v0.9.2 (20 August 2026) and the canonical external inputs listed there. Where this document needs domain logic, it **references the canonical input by section**; it does not restate it. This TAD is canonical-and-living and **lives in the repository as `TAD.md`** (Playbook: Flow and canonical state), so amendments and code travel together and "does the TAD match the code" is checkable in one place. Where this TAD and an upstream canonical document conflict, the conflict is escalated to the Coordinator and resolved by amending the upstream document — never by a silent deviation here (amend-upstream rule).
@@ -70,6 +70,7 @@ fccprogramintegrator/
     Tile_Content_Appendix_B_YEAR_21AUG26.xlsx
   scripts/
     generate-declarations.ts    workbooks  -> src/generated/declarations.generated.json
+    generate-jurisdictions.ts   the 177-row jurisdiction table -> src/engine/reference/jurisdictions.ts (§B.2 amendment, phase 2 work)
     generate-fixture.ts         seeded generator -> src/generated/fixture.generated.json
     check.ts                    the one check script (§L.3)
   config/
@@ -307,6 +308,7 @@ That guarantees the board never scrolls. It does **not** guarantee content fits 
 | # | Unit | Area | Responsibility (one line) |
 |---|---|---|---|
 | D.1.1 | `generate-declarations.ts` | build-time | Turn the three workbooks into declaration data |
+| D.1.1b | `generate-jurisdictions.ts` | build-time | Ingest the 177-row jurisdiction table into `reference/jurisdictions.ts` — phase 2 (§B.2 amendment) |
 | D.1.2 | `generate-fixture.ts` | build-time | Produce the seeded, honestly-scored population |
 | D.1.3 | `check.ts` | build-time | Run every mechanical claim this document makes |
 | D.2.1 | `methodology.ts` | engine | The canonical rule, as constants and band functions |
@@ -421,6 +423,15 @@ These run on the Coordinator's machine, never on Vercel and never in the browser
 > 📐 **Design Note — why generate-and-commit rather than parse at build time.** Parsing `.xlsx` during every Vercel build puts a binary file format, a parser and a build step into the deploy chain of a pipeline nobody on the team has run before, in exchange for a convenience worth having a handful of times. The founding razor decides it: a permanent cost for an occasional benefit. **The workbooks remain canonical; the generated file is never hand-edited; a content change is a workbook edit followed by a regeneration, in that order.** *(Designer response to Architect Q1, 20 August 2026.)*
 
 > 🔧 **Implementation Note — the stale EWRA note.** The EWRA row's `Notes` cell still reads *"Process tile. Label only by design — no hero, no trend, no health mark"* while the row correctly carries `42 / Increasing / Amber`, per DD §3's record that EWRA moved. The `Notes` column is not imported, so this is harmless to the build — recorded here only so an Author reading the workbook does not file a bug. A Coordinator content correction at the next workbook touch.
+
+#### D.1.1b `scripts/generate-jurisdictions.ts` *(TAD amendment, §B.2 gap — proposed at handoff 21 Aug 2026, committed here 23 Aug 2026)*
+- **Identity / path:** `scripts/generate-jurisdictions.ts`. Node script, run once by `npm run generate:jurisdictions`.
+- **Dependencies:** `Country_Risk_Ratings_20AUG26.docx` (the 177-row jurisdiction table, canonical, verbatim); Node's built-in docx-reading is not assumed — a `.docx`-table-extraction approach is a phase 2 implementation decision, not specified here. **Imports nothing from `src/shell` or `src/modules`.**
+- **Placement:** build-time only, run once (not part of `vite build`), same discipline as `generate-declarations.ts`: source document is canonical, the generated file is never hand-edited, a content change is a source-document edit followed by a regeneration.
+- **Output:** `src/engine/reference/jurisdictions.ts`, carrying the frozen `SOURCE` / `EDITION` / `ACCESSED` / `THRESHOLD` provenance constants (§D.2.3) and the 177-row band table.
+- **Gate conditions this script must enforce** (phase 2 exit, not phase 1): exactly 177 rows; exactly one row banded `Low` and it is the United States (§C.4's startup assertions read this table at runtime and re-check both).
+
+> 📐 **Design Note — why this is a fourth script rather than folded into an existing one.** §B.2 as approved enumerated three scripts and none of them ingests the jurisdiction table — a gap the Architect's 21 August handoff flagged and asked the incoming Engineer to raise rather than quietly patch around. It is a **one-time job on a Word document**, structurally identical in spirit to `generate-declarations.ts` (source document → generated TypeScript, never hand-edited, gate-checked at load), so it follows that script's pattern rather than inventing a new one. Committed here, at the phase 1 handoff, rather than left as a standing proposal — the amend-upstream discipline this project holds elsewhere applies to its own open items too, not only to construction-time defects. Building the script itself is phase 2 work, since the reference table it produces is consumed entirely by the engine.
 
 #### D.1.2 `scripts/generate-fixture.ts`
 - **Identity / path:** `scripts/generate-fixture.ts`. Run by `npm run generate:fixture`.
@@ -1447,3 +1458,4 @@ That split is what keeps the shell generic: the shell provides storage typed `un
 | **1.0** | **21 Aug 2026** | **Approved and released for construction.** TAD-to-DD fidelity pass returned clean with no findings. No content change from v0.3 beyond this approval. |
 | **1.1** | **21 Aug 2026** | Upstream closures carried, no architectural change. **The two Board mark-legend strings are final** — *Business Risk* and *Control Risk*, DD v0.9.4 Appendix A.4 — the short-form authorisation superseded and the width contingency removed, so nothing about the frame is decided at the phase 1 exit; §K.2.12 rewritten accordingly. **F.23 closed** as a fifth supersession of the frozen Form at DD v0.9.3. DD §5's live-tile metric header corrected upstream. Citations moved from DD v0.9.2 to v0.9.4. **All content items blocking phase 1 are now closed.** |
 | **1.2** | **22 Aug 2026** | **Construction amendment.** Vercel's Node.js Version control and build-log warning confirmed the platform enforces major-version selection only — an exact-patch pin (`24.19.0`) is not achievable on this host, though it remains correct and useful for `.nvmrc`/`engines.node` and local development. §B.1's Node runtime note, §B.3's "Node parity" exit line, and §J.1's phase 1 exit checklist amended to check **major-version match (24.x), or as close as the platform allows**, rather than exact patch. Coordinator-approved, 22 Aug 2026. |
+| **1.3** | **23 Aug 2026** | **Construction amendment, phase 1 handoff.** Closes the §B.2 gap the Architect's 21 August handoff flagged and asked to be raised rather than patched around: a fourth build-time script, `scripts/generate-jurisdictions.ts` (§D.1.1b), added to ingest the 177-row jurisdiction table into `src/engine/reference/jurisdictions.ts`. Follows `generate-declarations.ts`'s own pattern — source document canonical, generated file never hand-edited. The script's *specification* is committed here; building it is phase 2 work, since its output is consumed entirely by the engine. No other architectural change — this closes a known, previously-flagged gap rather than opening a new one. |

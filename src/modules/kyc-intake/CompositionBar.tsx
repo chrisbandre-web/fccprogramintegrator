@@ -5,68 +5,30 @@ import type { Composition } from './selectors.ts';
 // same point and is comparable down the column. Built from flex children
 // with percentage widths — there is no chart library (§F.23). Labels are
 // always present (Rule E — colour is never alone).
-export function CompositionBar({
-  label,
-  composition,
-  selected,
-  onSelect,
-  disabled = false,
-}: {
-  label: string;
-  composition: Composition;
-  selected: boolean;
-  onSelect?: () => void;
-  disabled?: boolean;
-}): JSX.Element {
-  const interactive = !disabled && !!onSelect;
-
+//
+// Purely presentational. Selection lives one level up, on the group that
+// contains a bar (§D.6.5's Comparison: a pair of bars is one destination,
+// not two) — this component used to be its own <button>, nested inside
+// the group's clickable container. Nested interactive elements are a real
+// bug, not a style choice: a disabled inner <button> swallows the click
+// before it reaches the group's own handler, since disabled form controls
+// don't dispatch (and in most browsers don't bubble) click events. Found
+// live, 24 Aug 2026 — clicking a bar did nothing.
+export function CompositionBar({ label, composition }: { label: string; composition: Composition }): JSX.Element {
   return (
-    <button
-      type="button"
-      onClick={interactive ? onSelect : undefined}
-      disabled={!interactive}
-      aria-pressed={interactive ? selected : undefined}
-      style={{
-        display: 'block',
-        width: '100%',
-        textAlign: 'left',
-        background: 'transparent',
-        border: 'none',
-        padding: 0,
-        cursor: interactive ? 'pointer' : 'default',
-        font: 'inherit',
-        color: 'inherit',
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'baseline',
-          justifyContent: 'space-between',
-          gap: 'var(--space-2)',
-          // TAD §D.6.5, Design System spec §8.3 — the selected state must
-          // be readable without motion (prefers-reduced-motion loses the
-          // collapse animation): weight, a left rule, and a position
-          // marker, all three independent of any transition.
-          borderLeft: selected ? '3px solid var(--ink-primary)' : '3px solid transparent',
-          paddingLeft: 'var(--space-2)',
-        }}
-      >
-        <span
-          style={{
-            font: `var(${selected ? '--weight-semibold' : '--weight-regular'}) var(--type-legend) / var(--leading-tight) var(--font-family)`,
-            color: 'var(--ink-secondary)',
-          }}
-        >
-          {selected && <span aria-hidden="true">▸ </span>}
-          {label}
-        </span>
-        {composition.total === 0 ? (
-          <span style={{ font: 'var(--weight-regular) var(--type-legend) / var(--leading-tight) var(--font-family)', color: 'var(--ink-tertiary)' }}>
-            no records
+    <div>
+      {label && (
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 'var(--space-2)' }}>
+          <span style={{ font: 'var(--weight-regular) var(--type-legend) / var(--leading-tight) var(--font-family)', color: 'var(--ink-secondary)' }}>
+            {label}
           </span>
-        ) : null}
-      </div>
+          {composition.total === 0 ? (
+            <span style={{ font: 'var(--weight-regular) var(--type-legend) / var(--leading-tight) var(--font-family)', color: 'var(--ink-tertiary)' }}>
+              no records
+            </span>
+          ) : null}
+        </div>
+      )}
       <div
         style={{
           display: 'flex',
@@ -74,7 +36,7 @@ export function CompositionBar({
           height: 20,
           borderRadius: 2,
           overflow: 'hidden',
-          marginTop: 'var(--space-1)',
+          marginTop: label ? 'var(--space-1)' : 0,
           background: 'var(--surface-edge)',
         }}
       >
@@ -86,6 +48,6 @@ export function CompositionBar({
           </>
         )}
       </div>
-    </button>
+    </div>
   );
 }

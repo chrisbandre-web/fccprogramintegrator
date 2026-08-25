@@ -58,12 +58,12 @@ function ComparisonGroup({
         {groupLabel}
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-        {book && <CompositionBar label="Book" composition={book} selected={false} disabled />}
+        {book && <CompositionBar label="Book" composition={book} />}
         {/* Collapsed: one bar, no sub-label — the group heading above
             already names it (whole book, or the line). Full height: the
             recent-intake bar is always labelled explicitly, paired with
             the book bar above it. */}
-        <CompositionBar label={collapsed ? '' : 'Recent intake'} composition={recent} selected={false} disabled />
+        <CompositionBar label={collapsed ? '' : 'Recent intake'} composition={recent} />
       </div>
     </div>
   );

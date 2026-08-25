@@ -1,6 +1,6 @@
 /* =============================================================================
    FCC Program Integrator — Design System tokens
-   Touch Two · v1.0 · 19 August 2026 · Art Director / Design System owner
+   Touch Two · v1.1 · amended 23 August 2026 · Art Director / Design System owner
 
    THE ONE TOKEN FILE. Every value the build uses lives here. No component
    hardcodes a value this file defines. Role names are the vocabulary the
@@ -57,7 +57,7 @@
                                       (2.77 / 2.72); the direction that actually needed testing was
                                       lighter, not heavier, since contrast improves as the veil
                                       lightens (no floor to trade against on that side). At 0.28:
-                                      primary ink 6.75:1, red mark 4.10:1, amber mark 3.55:1, green
+                                      primary ink 6.75:1, red mark 4.10:1, amber mark 3.53:1, green
                                       mark 3.49:1 — a real step down from 0.32, clear of the 3:1
                                       floor by enough margin that E2 (marks defensible on shape
                                       redundancy rather than the contrast number) is retired; the
@@ -85,7 +85,7 @@
      --------------------------------------------------------------------------- */
 
   --status-red:        #A32219;   /* surface 7.12 · scrimmed 4.10 (at 0.28) · on live-fill 3.38 */
-  --status-amber:      #73531F;   /* surface 6.68 · scrimmed 3.55 (at 0.28) · on live-fill 3.17 */
+  --status-amber:      #73531F;   /* surface 6.68 · scrimmed 3.53 (at 0.28) · on live-fill 3.17 */
   --status-green:      #4E5F42;   /* surface 6.56 · scrimmed 3.49 (at 0.28) · on live-fill 3.11 */
 
   --mark-size:         14px;      /* 10.5 rendered — a Harvey ball, see §5 of the spec */
@@ -106,24 +106,53 @@
 
   /* ---------------------------------------------------------------------------
      6. ENCODING 4 — CUSTOMER RISK RATING  (drill-down only, never the board)
-     One hue family, three steps, always label-bearing. Two expressions:
+     Cool-to-hot escalation, three steps, always label-bearing. Two expressions:
      BAR fills on the Comparison, TEXT tint on the Records Rating cell.
      Rule D: chroma decreases with depth — the Comparison carries the ramp
      doing structural work; the Records carries its quietest step on one cell.
+
+     AMENDMENT 1 (23 Aug 2026, approved): two defects, found by the Coordinator
+     on the phase 4 Comparison and confirmed independently by Engineer 3 against
+     the live build before this amendment was applied. (1) The prior single-hue
+     ramp read as shades of one colour rather than a risk scale — Design
+     Direction brief §2's "muted single-family ramp" had been read as a single
+     hue, when the load-bearing constraint was always the three things below,
+     not the hue count. (2) Low, at #EADFD4, measured 1.18:1 against the
+     ground — below the threshold at which a filled area reads as distinct
+     from an empty one, so a low-risk book's bar appeared to stop at ~8% of
+     its width rather than continue in pale Low to full width. Confirmed live
+     on Retail's and Asset Management's book bars in the phase 4 screenshots.
+     The correction travels through hue (cool, to warm, to hot) as well as
+     value — a severity metaphor read without instruction, unambiguous in
+     direction, and containing no green anywhere, so it cannot be mistaken for
+     the Board's RAG (encoding 4 never touches the Board; the two ramps never
+     co-occur on a surface). Rule D and Rule E are unchanged and Rule E is
+     strengthened: the Comparison's segments must carry their own percentage
+     values (not just a sidebar key) — a phase 5 build item, not yet applied.
      --------------------------------------------------------------------------- */
 
-  --risk-bar-high:     #8F4526;   /* label in --surface: 6.55:1 */
-  --risk-bar-medium:   #C08A62;   /* label in --ink-primary: 5.85:1 */
-  --risk-bar-low:      #EADFD4;   /* label in --ink-primary: 13.26:1 */
-  /* adjacency: high|medium 2.31 · medium|low 2.27 — segments separate without labels,
-     though labels are present regardless (Rule E) */
+  --risk-bar-low:      #B4BCC0;   /* cool slate   · 1.74:1 on ground (was 1.18 — the defect) */
+  --risk-bar-medium:   #C08040;   /* ochre        · 2.95:1 on ground */
+  --risk-bar-high:     #8C2F20;   /* deep oxblood · 7.44:1 on ground */
+  /* Segment labels (Rule E — required):
+       on low    use --ink-primary (9.03:1)
+       on medium use --ink-primary (5.31:1)
+       on high   use --surface     (7.84:1)  <- light on dark
+     adjacency: low|medium 1.70 · medium|high 2.52 — the low|medium figure
+     understates the pairing (it differs in hue as much as lightness, and
+     labels are present regardless per Rule E; recorded as a knowing
+     position in Amendment 1 §5.1, not left for a reviewer to find). */
 
-  --risk-text-high:    #8A3F22;   /* 7.09:1 on surface */
-  --risk-text-medium:  #7D5B42;   /* 5.79:1 on surface */
-  --risk-text-low:     #6E6A63;   /* 5.11:1 on surface */
+  --risk-text-low:     #57626A;   /* 5.94:1 on surface */
+  --risk-text-medium:  #7E5416;   /* 6.30:1 on surface */
+  --risk-text-high:    #8C2F20;   /* 7.84:1 on surface */
   /* Text tint, not a cell wash: the Rating column sits mid-table and a wash
      would run a vertical band of colour down a dense eleven-column grid,
-     reading as structure the table does not have. */
+     reading as structure the table does not have. Same family as the bars,
+     deliberately not the same values — an area being compared and a word
+     being read have different legibility problems; bars are held to the 3:1
+     graphical standard with labels present, text tints clear 4.5:1 on their
+     own (Amendment 1 §4.2). */
 
   /* ---------------------------------------------------------------------------
      7. ACCENT  (focus, links, interactive affordances — never status)

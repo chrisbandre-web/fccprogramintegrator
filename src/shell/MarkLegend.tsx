@@ -1,7 +1,7 @@
 import { boardContext } from '../declarations/contexts.ts';
 import { moduleRegistry } from '../declarations/registry.ts';
 import type { LegendEntry } from '../declarations/types.ts';
-import { useSessionState } from './SessionStateProvider.tsx';
+import { useActiveContext } from './SessionStateProvider.tsx';
 
 function LegendItem({ entry }: { entry: LegendEntry }): JSX.Element {
   if (entry.kind === 'health-and-trend') {
@@ -30,11 +30,11 @@ function LegendItem({ entry }: { entry: LegendEntry }): JSX.Element {
 
 // TAD §D.5.10 — renders the active context's declared LegendEntry[].
 export function MarkLegend(): JSX.Element {
-  const { activeContextId } = useSessionState();
+  const [activeContext] = useActiveContext();
   const legend =
-    activeContextId === 'board'
+    activeContext === 'board'
       ? boardContext.legend
-      : moduleRegistry.find((d) => d.id === activeContextId)?.legend ?? [];
+      : moduleRegistry.find((d) => d.id === activeContext)?.legend ?? [];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>

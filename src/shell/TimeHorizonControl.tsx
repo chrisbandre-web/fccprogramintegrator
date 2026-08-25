@@ -1,5 +1,5 @@
 import type { Horizon } from '../data/types.ts';
-import { useSessionState } from './SessionStateProvider.tsx';
+import { useContextHorizon } from './SessionStateProvider.tsx';
 
 const HORIZONS: readonly { id: Horizon; label: string }[] = [
   { id: 'month', label: 'Month' },
@@ -8,7 +8,7 @@ const HORIZONS: readonly { id: Horizon; label: string }[] = [
 ];
 
 export function TimeHorizonControl(): JSX.Element {
-  const { horizon, setHorizon } = useSessionState();
+  const [horizon, setHorizon] = useContextHorizon();
 
   return (
     <div role="radiogroup" aria-label="Time Horizon" style={{ display: 'flex', gap: 'var(--space-2)' }}>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSessionState } from './SessionStateProvider.tsx';
+import { useContextHorizon } from './SessionStateProvider.tsx';
 
 // TAD §J.1 exit: "open .../?fit-check=1 ... confirm the line reads
 // 'fit check: 26 elements, no overruns'." Renders nothing whatsoever when
@@ -50,7 +50,7 @@ interface ScanResult {
 
 export function OverflowSentinel(): JSX.Element | null {
   const active = isFitCheckActive();
-  const { horizon } = useSessionState();
+  const [horizon] = useContextHorizon();
   const [result, setResult] = useState<ScanResult | null>(null);
 
   useEffect(() => {

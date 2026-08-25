@@ -8,6 +8,8 @@ import { loadLiveElementSource } from '../../declarations/load.ts';
 import type { ComputeContext, ElementContent, ModuleDeclaration } from '../../declarations/types.ts';
 import { defaultSchema } from '../../declarations/schema.ts';
 import { asAtHighShare } from './selectors.ts';
+import { customerIntakeAlignment } from './alignment.ts';
+import { CustomerIntakeModule } from './CustomerIntakeModule.tsx';
 
 const source = loadLiveElementSource('customers');
 
@@ -98,4 +100,9 @@ export const customerIntakeModule: ModuleDeclaration = {
     year: 'T-365',
   },
   schema: defaultSchema(),
+  // TAD §D.6.7 — the traceability moment. Declared here, not hardcoded in
+  // MethodologyLabel, so a second module carries its own without editing
+  // that component.
+  alignment: customerIntakeAlignment,
+  surface: CustomerIntakeModule,
 };

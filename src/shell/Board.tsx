@@ -3,10 +3,10 @@ import { moduleRegistry } from '../declarations/registry.ts';
 import { BandLabel } from './BandLabel.tsx';
 import { TileBand } from './TileBand.tsx';
 import { RegisterField } from './RegisterField.tsx';
-import { useSessionState } from './SessionStateProvider.tsx';
+import { useContextHorizon } from './SessionStateProvider.tsx';
 
 export function Board({ onActivateModule }: { onActivateModule: (id: string) => void }): JSX.Element {
-  const { horizon } = useSessionState();
+  const [horizon] = useContextHorizon('board');
 
   return (
     <div style={{ width: 'var(--field-width)' }}>

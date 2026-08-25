@@ -391,6 +391,51 @@ async function checkFixtureDdGate(): Promise<void> {
   }
 }
 
+// --- Population (§L.3 items 20-21, added v1.5) -------------------------------
+//
+// NAMING NOTE: v1.5's prose numbers these list items 20 and 21, but the
+// literal check.ts identifier "TAD-20" was already assigned (by an
+// Engineer, ad hoc, matching this script's pre-existing convention where
+// literal IDs don't track L.3's prose position 1:1 -- e.g. list item 8 is
+// printed as "TAD-20" for the HealthMark/scrim rule). Using the document's
+// suggested "TAD-20"/"TAD-21" literally here would collide with that
+// existing, already-gated check. TAD-21 and TAD-22 are free; used here.
+// The register-arrangement check v1.5 calls "TAD-22" is therefore free at
+// TAD-23 when it's built -- not built here, since register layout is
+// phase 1's surface, not phase 3's data layer.
+async function checkPopulationInvariants(): Promise<void> {
+  const { buildSnapshot } = await import('../src/data/snapshot.ts');
+  try {
+    const snapshot = buildSnapshot();
+    const deepestReach = addDaysCheck(snapshot.asOf, -395);
+    record(
+      'TAD-21',
+      'bookCutoff <= addDays(asOf, -395), and book and intake partition the snapshot with no record on both sides and none on neither',
+      snapshot.meta.bookCutoff <= deepestReach,
+      `bookCutoff=${snapshot.meta.bookCutoff} deepestReach=${deepestReach}`,
+    );
+
+    const yearStart = addDaysCheck(snapshot.asOf, -395);
+    const yearEnd = addDaysCheck(snapshot.asOf, -365);
+    const contaminated = snapshot.records.filter(
+      (r) => r.onboardedAt <= snapshot.meta.bookCutoff && r.onboardedAt > yearStart && r.onboardedAt <= yearEnd,
+    );
+    record(
+      'TAD-22',
+      "The deepest intake window -- the Board's Year as-at -- returns no record dated on or before bookCutoff",
+      contaminated.length === 0,
+      `${contaminated.length} contaminating record(s)`,
+    );
+  } catch (e) {
+    record('TAD-21', 'bookCutoff <= addDays(asOf, -395), and book and intake partition the snapshot', false, String(e));
+  }
+}
+
+function addDaysCheck(d: string, n: number): string {
+  const [y, m, day] = d.split('-').map(Number) as [number, number, number];
+  return new Date(Date.UTC(y, m - 1, day + n)).toISOString().slice(0, 10);
+}
+
 // --- Build itself -----------------------------------------------------------
 
 function checkBuild(): void {
@@ -418,6 +463,7 @@ await checkBandBoundaries();
 await checkPepFloorNeverCeiling();
 await checkJurisdictionTable();
 await checkFixtureDdGate();
+await checkPopulationInvariants();
 checkTypecheck();
 checkLint();
 checkVitest();

@@ -81,10 +81,40 @@ function assignSpreadDates<T>(monthsAgo: number, items: readonly T[]): { item: T
   const n = shuffled.length;
   return shuffled.map((item, i) => ({ item, onboardedAt: addDays(start, Math.min(30, 1 + Math.floor(((i + 0.5) * 30) / Math.max(1, n)))) }));
 }
+// TAD §D.1.2, §C.3 (v1.5) — the book/intake date floor. intakeBuckets and
+// bucketDays, named here rather than left as inline literals, because
+// bookCutoff is derived from them, not hardcoded (§L.4's "everything
+// specified rather than left to judgement"). MONTHS is the same constant
+// the intake loop below already used pre-v1.5; kept as one name so the
+// bucket count that drives intake generation and the cutoff that bounds
+// book generation can never silently diverge.
+const BUCKET_DAYS = 30;
+const MONTHS = 14; // 13 wasn't enough: Board-year's window (asOf offset 365, +/-30) reaches
+// as far back as 395 days, and 13 buckets (0..12) only cover to 390 days,
+// leaving the window's oldest 5 days with no data and the rest resting on
+// a small, noisy partial-bucket sample. A 14th baseline month covers the
+// full 395-day reach with margin.
+const BOOK_CUTOFF: IsoDate = addDays(cfg.asOf, -(MONTHS * BUCKET_DAYS)); // 14 x 30 = 420 -> asOf - 420
+
+// 395 is the deepest date any intake query can reach — the Board's Year
+// as-at window is (asOf-395, asOf-365] (TAD §L.4.2). Asserted, not
+// assumed: if MONTHS or BUCKET_DAYS ever changes such that the cutoff
+// rises above this line, generation fails loudly rather than silently
+// reintroducing the contamination this floor exists to close.
+if (BOOK_CUTOFF > addDays(cfg.asOf, -395)) {
+  throw new Error(
+    `generate-fixture: BOOK_CUTOFF (${BOOK_CUTOFF}) is not at or before asOf-395 ` +
+    `(${addDays(cfg.asOf, -395)}). The Board's Year as-at query would reach into book ` +
+    'territory. Increase MONTHS or BUCKET_DAYS so intakeBuckets * bucketDays >= 395.',
+  );
+}
+
 function randomHistoricalBookDate(): IsoDate {
-  // Book membership ignores asOf/windowDays entirely (TAD §C.3); dates here
-  // are cosmetic realism only, spread over the preceding five years.
-  return addDays(cfg.asOf, -randInt(30, 5 * 365));
+  // TAD §C.3, §D.1.2 (v1.5) — population membership is a pure date
+  // predicate: book records fall in [bookCutoff - 5y, bookCutoff],
+  // intake records in (bookCutoff, asOf]. Before v1.5 this had no floor,
+  // and book records could — and did — land inside the intake windows.
+  return addDays(BOOK_CUTOFF, -randInt(0, 5 * 365));
 }
 
 /** Spread `total` as evenly as possible across `buckets` non-negative integers summing to `total`. */
@@ -306,14 +336,10 @@ const bookRecordCount = bookRetailTotal + bookCommercialTotal + bookAssetMgmtTot
   }
 }
 
-// --- Intake: 13 monthly buckets (monthsAgo 0..12), Retail/AM flat, ---------
+// --- Intake: 14 monthly buckets (monthsAgo 0..13), Retail/AM flat, ---------
 // --- Commercial ramping per config -----------------------------------------
+// (MONTHS is declared above, ahead of book generation — see BOOK_CUTOFF.)
 
-const MONTHS = 14; // 13 wasn't enough: Board-year's window (asOf offset 365, +/-30) reaches
-// as far back as 395 days, and 13 buckets (0..12) only cover to 390 days,
-// leaving the window's oldest 5 days with no data and the rest resting on
-// a small, noisy partial-bucket sample. A 14th baseline month covers the
-// full 395-day reach with margin.
 let seniorForeignPepPlaced = false;
 
 // Retail and Asset Management: distribute each line's TOTAL High target
@@ -446,6 +472,34 @@ function pct(n: number): string {
 }
 
 const book = records.filter((r) => bookReferenceSet.has(r.reference));
+
+// TAD §D.1.2 (v1.5) — enforced at generation: every record falls in
+// [BOOK_CUTOFF - 5y, BOOK_CUTOFF] (book) or (BOOK_CUTOFF, asOf] (intake),
+// disjoint and exhaustive, and the deepest intake reach (the Board's Year
+// as-at window) returns nothing on or before BOOK_CUTOFF.
+{
+  const misplacedBook = book.filter((r) => r.onboardedAt > BOOK_CUTOFF);
+  const misplacedIntake = records.filter((r) => !bookReferenceSet.has(r.reference) && r.onboardedAt <= BOOK_CUTOFF);
+  if (misplacedBook.length > 0 || misplacedIntake.length > 0) {
+    throw new Error(
+      `generate-fixture: book/intake partition violated — ${misplacedBook.length} book record(s) ` +
+      `dated after BOOK_CUTOFF, ${misplacedIntake.length} intake record(s) dated on or before it. ` +
+      'First offender: ' + JSON.stringify(misplacedBook[0] ?? misplacedIntake[0]),
+    );
+  }
+  const yearWindowStart = addDays(cfg.asOf, -395);
+  const yearWindowEnd = addDays(cfg.asOf, -365);
+  const contaminated = records.filter(
+    (r) => r.onboardedAt > yearWindowStart && r.onboardedAt <= yearWindowEnd && r.onboardedAt <= BOOK_CUTOFF,
+  );
+  if (contaminated.length > 0) {
+    throw new Error(
+      `generate-fixture: ${contaminated.length} record(s) at or before BOOK_CUTOFF fall inside the ` +
+      `Board's Year as-at window (${yearWindowStart}, ${yearWindowEnd}] — exactly the contamination the floor exists to close.`,
+    );
+  }
+}
+
 const bookByLine = {
   'retail-consumer': book.filter((r) => r.businessLine === 'retail-consumer'),
   commercial: book.filter((r) => r.businessLine === 'commercial'),
@@ -611,6 +665,7 @@ const output = {
     asOf: cfg.asOf,
     generatedAt: new Date().toISOString().slice(0, 10),
     randomSeed: cfg.randomSeed,
+    bookCutoff: BOOK_CUTOFF,
     jurisdictionSource: { source: 'Basel AML Index, Public Edition', edition: '2025', accessed: '2026-08-20', threshold: '> 5.00' },
   },
   records,

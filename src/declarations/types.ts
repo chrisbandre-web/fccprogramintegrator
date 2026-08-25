@@ -2,6 +2,7 @@
 // without a Coordinator-approved amendment to the TAD (§K.1).
 import type { ComponentType } from 'react';
 import type { Horizon, Rating } from '../data/types.ts';
+import type { CustomerDataAccess } from '../data/dataAccess.ts';
 import type { DeclarationSchema } from './schema.ts';
 
 export type ByHorizon<T> = { readonly month: T; readonly quarter: T; readonly year: T };
@@ -17,9 +18,10 @@ export type BandId = 'business-risk' | 'program-elements';
 
 export interface ComputeContext {
   readonly horizon: Horizon;
-  // The data-access interface (§C.3) is injected here in phase 3 (§J.3).
-  // Phase 1's live-tile resolvers ignore this context entirely and return
-  // DD §3's stubbed figures (TAD §D.6.1, "the phase 1 stub").
+  // TAD §L.4.7's final shape, wired in phase 3 (§J.3): the data-access
+  // interface (§C.3), so a computed slot's resolver can query live data
+  // instead of returning phase 1's stubbed DD §3 figures (§D.6.1).
+  readonly data: CustomerDataAccess;
 }
 
 export type HeroSlot =

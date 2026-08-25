@@ -26,6 +26,7 @@ export interface SnapshotMeta {
   readonly asOf: IsoDate;
   readonly generatedAt: IsoDate;
   readonly randomSeed: number;
+  readonly bookCutoff: IsoDate; // records on or before this date are the established book (§C.3, v1.5)
   readonly jurisdictionSource: { source: string; edition: string; accessed: IsoDate; threshold: string };
 }
 

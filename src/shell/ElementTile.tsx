@@ -1,19 +1,25 @@
 import type { KeyboardEvent } from 'react';
 import type { ElementContent, HeroSlot, TrendSlot } from '../declarations/types.ts';
+import type { CustomerDataAccess } from '../data/dataAccess.ts';
 import { HeroValue } from './HeroValue.tsx';
 import { TrendGlyph } from './TrendGlyph.tsx';
 import { HealthMark } from './HealthMark.tsx';
+import { useDataAccess } from './DataAccessProvider.tsx';
 
-function resolveHero(slot: HeroSlot, horizon: 'month' | 'quarter' | 'year'): { value: number | string; unit: string } | null {
+function resolveHero(
+  slot: HeroSlot,
+  horizon: 'month' | 'quarter' | 'year',
+  data: CustomerDataAccess,
+): { value: number | string; unit: string } | null {
   if (slot.kind === 'absent') return null;
   if (slot.kind === 'authored') return { value: slot.value, unit: slot.unit };
-  return slot.resolve({ horizon });
+  return slot.resolve({ horizon, data });
 }
 
-function resolveTrend(slot: TrendSlot, horizon: 'month' | 'quarter' | 'year') {
+function resolveTrend(slot: TrendSlot, horizon: 'month' | 'quarter' | 'year', data: CustomerDataAccess) {
   if (slot.kind === 'absent') return null;
   if (slot.kind === 'authored') return slot.value;
-  return slot.resolve({ horizon });
+  return slot.resolve({ horizon, data });
 }
 
 export function ElementTile({
@@ -29,8 +35,9 @@ export function ElementTile({
   status: 'live' | 'inactive';
   onActivate?: () => void;
 }): JSX.Element {
-  const hero = resolveHero(content.hero, horizon);
-  const trend = resolveTrend(content.trend, horizon);
+  const data = useDataAccess();
+  const hero = resolveHero(content.hero, horizon, data);
+  const trend = resolveTrend(content.trend, horizon, data);
   const health = content.health.kind === 'authored' ? content.health.value : null;
 
   const interactive = status === 'live' && !!onActivate;

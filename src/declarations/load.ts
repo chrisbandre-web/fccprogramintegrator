@@ -109,6 +109,7 @@ export function loadInactiveDeclarations(): readonly ModuleDeclaration[] {
       content,
       legend: [], // inactive elements never become the active context; never read
       horizonLegend: EMPTY_HORIZON_LEGEND, // same — never read for inactive declarations
+      horizonQualifier: '', // same — never read for inactive declarations
       schema: defaultSchema(),
     };
   });

@@ -1,6 +1,6 @@
 /* =============================================================================
    FCC Program Integrator — Design System tokens
-   Touch Two · v1.1 · amended 23 August 2026 · Art Director / Design System owner
+   Touch Two · v1.2 · amended 25 August 2026 · Art Director / Design System owner
 
    THE ONE TOKEN FILE. Every value the build uses lives here. No component
    hardcodes a value this file defines. Role names are the vocabulary the
@@ -35,11 +35,11 @@
   --ink-tertiary:      #6E6A63;   /*  5.11:1 on surface — captions, band labels, legend   */
 
   /* !! BINDING RULE — INACTIVE ELEMENTS USE PRIMARY INK ONLY.
-     Secondary ink measures 4.14:1 through the scrim (at 0.28) and still FAILS
-     AA (needs 4.5). On any scrimmed element, the metric header and feed
-     caption step up to --ink-primary, which measures 6.75:1 through the
-     scrim. This is not a preference; it is the only combination that
-     clears the floor. */
+     Secondary ink measures 4.02:1 through the scrim at 0.28 — marginal, and it
+     fails outright at heavier veils. On any
+     scrimmed element, the metric header and feed caption step up to
+     --ink-primary, which measures 6.75:1 through the scrim. This is not a
+     preference; it is the only combination that clears the floor. */
 
   /* ---------------------------------------------------------------------------
      3. ENCODING 1 — MODULE STATUS  (live / inactive)
@@ -51,42 +51,25 @@
   --live-fill-edge:    #5E93B2;
   /* ink-primary on live-fill = 7.85:1 */
 
-  --scrim-opacity:     0.28;      /* CONFIRMED, 23 Aug 2026, second pass — lowered from 0.32.
-                                      The Design System owner's 0.40 recommendation would have
-                                      pushed status-amber and status-green below the 3:1 floor
-                                      (2.77 / 2.72); the direction that actually needed testing was
-                                      lighter, not heavier, since contrast improves as the veil
-                                      lightens (no floor to trade against on that side). At 0.28:
-                                      primary ink 6.75:1, red mark 4.10:1, amber mark 3.53:1, green
-                                      mark 3.49:1 — a real step down from 0.32, clear of the 3:1
-                                      floor by enough margin that E2 (marks defensible on shape
-                                      redundancy rather than the contrast number) is retired; the
-                                      marks now hold on contrast alone. 0.24 remains available if
-                                      0.28 still reads heavy; below that wants another screenshot
-                                      first. */
+  --scrim-opacity:     0.28;      /* AMENDMENT 1: was 0.32, confirmed against a real board */
   --scrim:             rgba(244, 243, 239, 0.28);   /* the ground, veiling. Never a hue. */
+  /* Scrim and fill are MUTUALLY EXCLUSIVE. No element is ever both filled and
+     scrimmed, so "a mark on a scrimmed live-tile" is not a state that exists. */
   /* A scrim with its own hue would shift red, amber and green by different
      perceptual amounts and break Rule C's graduation on 24 of 26 elements. */
-  /* Scrim and fill are mutually exclusive — no element is ever both. Fill
-     means live (the one live tile, unveiled); scrim means inactive (the
-     other 25 elements, veiled). A "scrim over live-fill" background does
-     not occur on the board. (Design System owner, 23 Aug 2026.) */
 
   /* ---------------------------------------------------------------------------
      4. ENCODING 2 — PROGRAM RISK  (bounded mark; never a surface)
      Two subjects, one ramp (DD v0.7 §5): Business Risk on the two tiles,
-     Control Risk on the 24 register rows. [Legend label finalized as
-     "Control Risk" over "Control Effectiveness Risk", 23 Aug 2026 —
-     Chris, parallelism with "Business Risk"; Design System owner
-     deferred, either form accurate.]
+     Control Effectiveness Risk on the 24 register rows.
      Rule C: saturation graduated by severity. HSL saturation, verified:
      red 0.734 > amber 0.575 > green 0.180. A healthy board is quiet by
      construction, not by restraint.
      --------------------------------------------------------------------------- */
 
-  --status-red:        #A32219;   /* surface 7.12 · scrimmed 4.10 (at 0.28) · on live-fill 3.38 */
-  --status-amber:      #73531F;   /* surface 6.68 · scrimmed 3.53 (at 0.28) · on live-fill 3.17 */
-  --status-green:      #4E5F42;   /* surface 6.56 · scrimmed 3.49 (at 0.28) · on live-fill 3.11 */
+  --status-red:        #A32219;   /* surface 7.12 · scrimmed 4.10 · on live-fill 3.38 */
+  --status-amber:      #73531F;   /* surface 6.68 · scrimmed 3.53 · on live-fill 3.17 */
+  --status-green:      #4E5F42;   /* surface 6.56 · scrimmed 3.49 · on live-fill 3.11 */
 
   --mark-size:         14px;      /* 10.5 rendered — a Harvey ball, see §5 of the spec */
   --mark-stroke:       1.75px;
@@ -106,53 +89,31 @@
 
   /* ---------------------------------------------------------------------------
      6. ENCODING 4 — CUSTOMER RISK RATING  (drill-down only, never the board)
-     Cool-to-hot escalation, three steps, always label-bearing. Two expressions:
+     One hue family, three steps, always label-bearing. Two expressions:
      BAR fills on the Comparison, TEXT tint on the Records Rating cell.
      Rule D: chroma decreases with depth — the Comparison carries the ramp
      doing structural work; the Records carries its quietest step on one cell.
-
-     AMENDMENT 1 (23 Aug 2026, approved): two defects, found by the Coordinator
-     on the phase 4 Comparison and confirmed independently by Engineer 3 against
-     the live build before this amendment was applied. (1) The prior single-hue
-     ramp read as shades of one colour rather than a risk scale — Design
-     Direction brief §2's "muted single-family ramp" had been read as a single
-     hue, when the load-bearing constraint was always the three things below,
-     not the hue count. (2) Low, at #EADFD4, measured 1.18:1 against the
-     ground — below the threshold at which a filled area reads as distinct
-     from an empty one, so a low-risk book's bar appeared to stop at ~8% of
-     its width rather than continue in pale Low to full width. Confirmed live
-     on Retail's and Asset Management's book bars in the phase 4 screenshots.
-     The correction travels through hue (cool, to warm, to hot) as well as
-     value — a severity metaphor read without instruction, unambiguous in
-     direction, and containing no green anywhere, so it cannot be mistaken for
-     the Board's RAG (encoding 4 never touches the Board; the two ramps never
-     co-occur on a surface). Rule D and Rule E are unchanged and Rule E is
-     strengthened: the Comparison's segments must carry their own percentage
-     values (not just a sidebar key) — a phase 5 build item, not yet applied.
      --------------------------------------------------------------------------- */
 
-  --risk-bar-low:      #B4BCC0;   /* cool slate   · 1.74:1 on ground (was 1.18 — the defect) */
+  /* AMENDMENT 1 (23 Aug 2026): cool -> warm -> hot escalation, not a single hue.
+     The prior single-hue ramp read as shades of one colour rather than as a risk
+     scale, and its Low sat at 1.18:1 against the ground — invisible, so a
+     low-risk book read as a truncated bar rather than as a full quiet one. */
+
+  --risk-bar-low:      #B4BCC0;   /* cool slate   · 1.74:1 on ground */
   --risk-bar-medium:   #C08040;   /* ochre        · 2.95:1 on ground */
   --risk-bar-high:     #8C2F20;   /* deep oxblood · 7.44:1 on ground */
-  /* Segment labels (Rule E — required):
+  /* Segment labels (Rule E — required, see Amendment 1 §3):
        on low    use --ink-primary (9.03:1)
        on medium use --ink-primary (5.31:1)
-       on high   use --surface     (7.84:1)  <- light on dark
-     adjacency: low|medium 1.70 · medium|high 2.52 — the low|medium figure
-     understates the pairing (it differs in hue as much as lightness, and
-     labels are present regardless per Rule E; recorded as a knowing
-     position in Amendment 1 §5.1, not left for a reviewer to find). */
+       on high   use --surface     (7.84:1)  <- light on dark */
 
   --risk-text-low:     #57626A;   /* 5.94:1 on surface */
   --risk-text-medium:  #7E5416;   /* 6.30:1 on surface */
   --risk-text-high:    #8C2F20;   /* 7.84:1 on surface */
   /* Text tint, not a cell wash: the Rating column sits mid-table and a wash
      would run a vertical band of colour down a dense eleven-column grid,
-     reading as structure the table does not have. Same family as the bars,
-     deliberately not the same values — an area being compared and a word
-     being read have different legibility problems; bars are held to the 3:1
-     graphical standard with labels present, text tints clear 4.5:1 on their
-     own (Amendment 1 §4.2). */
+     reading as structure the table does not have. */
 
   /* ---------------------------------------------------------------------------
      7. ACCENT  (focus, links, interactive affordances — never status)
@@ -190,6 +151,11 @@
   --type-metric-header:  16px;  /* 12.0  — AT THE FLOOR                      */
   --type-caption:        16px;  /* 12.0  — AT THE FLOOR, and under the scrim */
   --type-band-label:     16px;  /* 12.0  — caps, tracked                     */
+  --type-horizon-value:  24px;  /* 18.0  — AMENDMENT 2: the vertical horizon
+                                   control, deliberately larger than every other
+                                   frame control. It is the only control a viewer
+                                   is asked to operate during the demo.        */
+  --type-frame-label:    16px;  /* 12.0  — Program Element / Time Horizon      */
   --type-legend:         16px;  /* 12.0                                      */
   --type-table:          16px;  /* 12.0                                      */
   --type-body:           18px;  /* 13.5  — About modal                       */
@@ -232,9 +198,10 @@
   --register-columns:         3;
   --register-column-width: 509px;
   --register-column-gap:   24px;
-  --register-title-width:  232px;  /* CONFIRMED, 23 Aug 2026 — longest title (Models & Non-model Tools) measures ~206 canvas at 18px Inter; 26 canvas headroom. Promoted from a local code override; was a Touch Two addition not yet in this file. */
   --register-row-height:   57px;  /* 42.75 rendered — line1 25 + line2 20 + 6+6 padding */
   --register-row-gap:       8px;  /* within a group */
+  --register-title-width: 232px;  /* AMENDMENT 1: promoted from a local override.
+                                     Longest title measures ~206 canvas at 18px. */
   --register-group-gap:    24px;  /* BETWEEN groups — the only carrier of exam-manual
                                      grouping now that subheadings are dropped.
                                      Must read as a boundary, not a larger gap. */
@@ -242,8 +209,41 @@
   --band-label-block:      48px;
   --band-separation:       24px;
 
+  /* --- AMENDMENT 2: the navigation frame ------------------------------------
+     Frame width is UNCHANGED at 288 canvas. Every value below is composed
+     within it; nothing here re-measures the field. Measured frame content:
+     934 canvas against 1016 available — 82 canvas of vertical slack.          */
+
+  --frame-padding:         24px;  /* leaves 240 canvas of clear width          */
+  --frame-block-gap:       32px;  /* between frame blocks (mark, selector,
+                                     horizon, legends, About)                  */
+
+  --brand-mark-size:       88px;  /* 66 rendered — the mark's square box       */
+  --brand-mark-min-size:   32px;  /* below this, segments merge; see §3         */
+  --brand-mark-clear:      16px;  /* clear space on all four sides, minimum    */
+
+  --horizon-value-gap:      8px;  /* between stacked horizon values            */
+  --horizon-rule-width:     3px;  /* the selected value's leading rule         */
+  --horizon-rule-gap:      12px;  /* rule to text                              */
+
   /* Vertical budget: 980 used against 1016 available. Slack 36 canvas / 27
      rendered, held in reserve against the phase 1 scrim verification. */
+
+  /* ---------------------------------------------------------------------------
+     10b. BRAND  (AMENDMENT 2 — frame only)
+     The brand mark is permitted in the navigation frame and NOWHERE ELSE.
+     DD v0.9.5 §5: "the navigation frame may carry the brand mark; the board and
+     every data surface below it carry no imagery." This is a bounded exception
+     to Design Direction brief §1, not a general permission.
+     --------------------------------------------------------------------------- */
+
+  --brand-ink:         #2E2C28;   /* warm off-black — NOT --ink-primary.
+                                     The mark sits in the ground rather than on
+                                     it; pure black reads as applied.          */
+  --brand-accent:      #8C2F20;   /* == --risk-bar-high. One accent, reused.   */
+  /* File: FCC_mark_final.svg — five arcs, one gap, centre segment in accent.
+     Never recoloured, never rotated, never stretched. On any ground other than
+     --ground, place it on a --ground plate at --brand-mark-clear. */
 
   /* ---------------------------------------------------------------------------
      11. MOTION — functional only, always with a reduced-motion equivalent

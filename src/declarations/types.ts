@@ -67,6 +67,11 @@ export interface ModuleDeclaration {
    *  status:'live' modules — inactive declarations never become the
    *  active context, so this is unused for them (empty ByHorizon of ''). */
   readonly horizonLegend: ByHorizon<string>;
+  /** TouchTwo Amendment 2, DD Appendix A.4 — the frame header reads "Time
+   *  Period — {qualifier}" ("As at" for the Board, "Trailing" for a
+   *  module). Structurally distinct wording, not just different values,
+   *  so the two contexts can never be collapsed by accident. */
+  readonly horizonQualifier: string;
   readonly schema: DeclarationSchema;
   readonly alignment?: RegulatoryAlignment;
   readonly surface?: ComponentType; // live modules only
@@ -75,5 +80,6 @@ export interface ModuleDeclaration {
 export interface ContextDeclaration {
   readonly id: string; // 'board' or a module id
   readonly horizonLegend: ByHorizon<string>;
+  readonly horizonQualifier: string;
   readonly legend: readonly LegendEntry[];
 }

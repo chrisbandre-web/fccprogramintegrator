@@ -87,18 +87,28 @@ export const customerIntakeModule: ModuleDeclaration = {
     {
       kind: 'rating-ramp',
       label: 'Customer Risk Rating',
+      // TouchTwo Amendment 2 §6 — build defect, not a design change: the
+      // Comparison anchors High at the left (confirmed against
+      // CompositionBar.tsx's actual render order), and the legend must
+      // read the same order to teach it correctly rather than backwards.
+      // The document was already correct (v0.9.5 §12); this is the fix.
       steps: [
-        { rating: 'Low', label: 'Low' },
-        { rating: 'Medium', label: 'Medium' },
         { rating: 'High', label: 'High' },
+        { rating: 'Medium', label: 'Medium' },
+        { rating: 'Low', label: 'Low' },
       ],
     },
   ],
+  // TouchTwo Amendment 2, DD Appendix A.4 (confirmed 25 Aug 2026) —
+  // supersedes the construction-time "T-30/T-90/T-365" compression.
+  // Headed "Trailing", structurally distinct from the Board's "As at"
+  // wording, T-notation with "Days" spelled out.
   horizonLegend: {
-    month: 'T-30',
-    quarter: 'T-90',
-    year: 'T-365',
+    month: 'T - 30 Days',
+    quarter: 'T - 90 Days',
+    year: 'T - 365 Days',
   },
+  horizonQualifier: 'Trailing',
   schema: defaultSchema(),
   // TAD §D.6.7 — the traceability moment. Declared here, not hardcoded in
   // MethodologyLabel, so a second module carries its own without editing

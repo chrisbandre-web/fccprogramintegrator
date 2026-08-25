@@ -1,37 +1,45 @@
 import type { Horizon } from '../data/types.ts';
 import { useContextHorizon } from './SessionStateProvider.tsx';
 
+// TouchTwo Amendment 2 §2 — vertical stack, shortest to longest by label
+// length (Year 4 · Month 5 · Quarter 7), centred as a block within the
+// frame, left-aligned internally. Larger than every other frame control
+// (--type-horizon-value, 24 canvas) — the only control a viewer operates
+// during the demo.
 const HORIZONS: readonly { id: Horizon; label: string }[] = [
+  { id: 'year', label: 'Year' },
   { id: 'month', label: 'Month' },
   { id: 'quarter', label: 'Quarter' },
-  { id: 'year', label: 'Year' },
 ];
 
 export function TimeHorizonControl(): JSX.Element {
   const [horizon, setHorizon] = useContextHorizon();
 
   return (
-    <div role="radiogroup" aria-label="Time Horizon" style={{ display: 'flex', gap: 'var(--space-2)' }}>
-      {HORIZONS.map((h) => (
-        <button
-          key={h.id}
-          type="button"
-          role="radio"
-          aria-checked={horizon === h.id}
-          onClick={() => setHorizon(h.id)}
-          style={{
-            font: 'var(--weight-medium) var(--type-legend) / var(--leading-tight) var(--font-family)',
-            color: horizon === h.id ? 'var(--ink-primary)' : 'var(--ink-tertiary)',
-            background: horizon === h.id ? 'var(--surface)' : 'transparent',
-            border: `1px solid ${horizon === h.id ? 'var(--surface-edge)' : 'transparent'}`,
-            borderRadius: 4,
-            padding: '4px 10px',
-            cursor: 'pointer',
-          }}
-        >
-          {h.label}
-        </button>
-      ))}
+    <div role="radiogroup" aria-label="Time Horizon" style={{ display: 'flex', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--horizon-value-gap)', alignItems: 'flex-start' }}>
+        {HORIZONS.map((h) => {
+          const selected = horizon === h.id;
+          return (
+            <button
+              key={h.id}
+              type="button"
+              role="radio"
+              aria-checked={selected}
+              data-selected={selected}
+              className="horizon-value"
+              onClick={() => setHorizon(h.id)}
+            >
+              {/* The rule's space is ALWAYS reserved (TouchTwo Amendment 2
+                  §2.2) — present, transparent, on every value, not just the
+                  selected one. Rendering it only when selected would shift
+                  the text horizontally on every click. */}
+              <span className="horizon-value__rule" />
+              {h.label}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

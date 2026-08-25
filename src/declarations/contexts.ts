@@ -3,23 +3,23 @@
 // "is this the board."
 import type { ByHorizon, ContextDeclaration } from './types.ts';
 
-// DD §2's two horizon wordings — deliberately structurally different so
-// they cannot be collapsed by accident. Board reads "as at" (a point in
-// time, offset from today); the module (when active) reads its own
-// trailing-window wording. Copy from the Coordinator, 22 Aug 2026: Board
-// Month reads "Today" (offset 0) while Quarter/Year read "T-90"/"T-365" —
-// which happen to numerically coincide with the module's own window
-// lengths at Quarter and Year, but diverge at Month, where the module's
-// trailing window is 30 days rather than "today."
+// TouchTwo Amendment 2, DD Appendix A.4 (confirmed 25 Aug 2026) — supersedes
+// the construction-time compressions ("Today"/"T-90"/"T-365"). Header reads
+// "Time Period — As at" on the Board, T-notation with "Days" spelled out.
+// Board reads "as at" (a point in time, offset from today); the module
+// (when active) reads its own trailing-window wording, headed "Trailing" —
+// structurally distinct wording, not just different values, so the two
+// contexts can never be collapsed by accident.
 const boardHorizonLegend: ByHorizon<string> = {
   month: 'Today',
-  quarter: 'T-90',
-  year: 'T-365',
+  quarter: 'T - 90 Days',
+  year: 'T - 365 Days',
 };
 
 export const boardContext: ContextDeclaration = {
   id: 'board',
   horizonLegend: boardHorizonLegend,
+  horizonQualifier: 'As at',
   legend: [
     {
       kind: 'health-and-trend',

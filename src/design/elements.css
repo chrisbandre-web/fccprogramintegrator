@@ -223,3 +223,46 @@
 .band + .band {
   margin-top: var(--band-separation);
 }
+
+/* ---------------------------------------------------------------------------
+   TimeHorizonControl (TouchTwo Amendment 2, §2.2) — three states, all
+   three properties (weight, ink, rule) changing together so selection is
+   never carried by colour alone (Rule E).
+   --------------------------------------------------------------------------- */
+.horizon-value {
+  display: flex;
+  align-items: center;
+  gap: var(--horizon-rule-gap);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font: var(--weight-regular) var(--type-horizon-value) / var(--leading-tight) var(--font-family);
+  color: var(--ink-secondary);
+  transition: color var(--motion-state);
+}
+
+.horizon-value:hover {
+  color: var(--ink-primary);
+}
+
+.horizon-value[data-selected='true'] {
+  font-weight: var(--weight-semibold);
+  color: var(--ink-primary);
+}
+
+.horizon-value:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.horizon-value__rule {
+  width: var(--horizon-rule-width);
+  height: 1em;
+  flex-shrink: 0;
+  background: transparent; /* the reserved, usually-invisible rule slot */
+}
+
+.horizon-value[data-selected='true'] .horizon-value__rule {
+  background: var(--accent);
+}

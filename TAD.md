@@ -1,6 +1,6 @@
 # FCC Program Integrator
 ## Technical Architecture Document (TAD)
-*Version: **1.4 · APPROVED**, originally 21 August 2026, amended 22, 23 and 24 August 2026 during construction · Branch: **React Web Application** · Stack: React 18 + Vite + TypeScript (strict), hosted on Vercel, push-to-deploy from `chrisbandre-web/fccprogramintegrator` · Status: **Released for construction***
+*Version: **1.5 · APPROVED**, originally 21 August 2026, amended 22, 23 and 24 August 2026 during construction · Branch: **React Web Application** · Stack: React 18 + Vite + TypeScript (strict), hosted on Vercel, push-to-deploy from `chrisbandre-web/fccprogramintegrator` · Status: **Released for construction***
 *Build: FCC Program Governance Dashboard (the seed build)*
 
 > **Canonical position.** This document is the contract the Author builds every component against and the structural reference the Implementor assembles and deploys to. It is drafted from the complete Design Document v0.9.2 (20 August 2026) and the canonical external inputs listed there. Where this document needs domain logic, it **references the canonical input by section**; it does not restate it. This TAD is canonical-and-living and **lives in the repository as `TAD.md`** (Playbook: Flow and canonical state), so amendments and code travel together and "does the TAD match the code" is checkable in one place. Where this TAD and an upstream canonical document conflict, the conflict is escalated to the Coordinator and resolved by amending the upstream document — never by a silent deviation here (amend-upstream rule).
@@ -227,6 +227,19 @@ export interface CustomerDataAccess {
 }
 ```
 
+**`population` is a date predicate, not a stored classification.** The fixture holds one record set. A record belongs to the **established book** if `onboardedAt <= meta.bookCutoff`, and to **intake** otherwise. Nothing on a record says which it is.
+
+```ts
+population: 'book'    →  onboardedAt <= bookCutoff                         // asOf and windowDays ignored
+population: 'intake'  →  addDays(asOf, -windowDays) < onboardedAt <= asOf  // and, by construction, > bookCutoff
+```
+
+**Book and intake are disjoint and exhaustive.** Their union is every record in the snapshot. Enforced at generation (§D.1.2), asserted at startup (§D.3.4), so neither filter needs to exclude the other explicitly.
+
+> 📐 **Design Note — why membership is derived rather than recorded *(added v1.5)*.** Three representations were weighed. **A `segment: 'book' | 'intake'` field on the record** is a derived classification written into the data — the failure §K.2.8 exists to prevent — and it makes an illegal state expressible: a record could carry `segment: 'book'` with a date inside the intake window, and no check would catch it, because the flag would be authoritative. **A reference-number boundary in `SnapshotMeta`** ties membership to generation order, which is not a property of the record. **Both fail the seed contract's own claim**: a backend must answer the same queries, and a real institution has no segment column and no *records 1–2,000 are the book* boundary. It has onboarding dates. A date predicate is the only representation a real data source can satisfy. It also makes Reviewer F-10's stock-versus-flow distinction structural — book records carry post-onboarding alert escalations *because* they are older, rather than because a design note says so.
+
+> 🔧 **Implementation Note — the defect this closed, found by Engineer 3 on 24 August 2026.** Before v1.5 the generator gave book records cosmetic dates with **no floor**, and resolved book membership through a closure-scoped set of reference numbers never written to the shipped fixture. So `population: 'book'` had no honest implementation at all, and book records fell inside the intake windows and contaminated them: **Quarter by 37 records and Year by 30, moving Year from a true 5.00% to a reported 5.93%.** Month was unaffected only by accident, because the generator's cosmetic lower bound happened to clear the 30-day window. Caught in `fixtureDataAccess.ts` before it reached a surface. **Corrected at source in the generator, not filtered in the data layer.**
+
 **One primitive serves both number sets (⚠️ A7).** The Board's *as-at* reading is `{ population: 'intake', asOf: today − {0, 90, 365} days, windowDays: 30 }`. The module's *trailing window* is `{ population: 'intake', asOf: today, windowDays: {30, 90, 365} }`. There is no second code path, no second store and no per-horizon precomputation.
 
 > 📐 **Design Note — this is why Month agrees across both contexts.** DD §3 records that the Board and the module coincide at 11.0% on Month and diverge at Quarter and Year. Under one primitive that agreement is **structural**: Board-Month and module-Month resolve to the identical query, so they cannot drift apart even if a knob moves. Under two code paths it would have been a coincidence maintained by hand — which is how a prior version came to ship the wrong number set. The seam most likely to produce that error is closed by construction rather than by care.
@@ -444,6 +457,22 @@ These run on the Coordinator's machine, never on Vercel and never in the browser
 - **Lifecycle:** run on demand; re-run whenever a knob moves. Deterministic — the same config produces a byte-identical file.
 - **Inputs / outputs:** in — config. Out — the fixture JSON, the validation report, and a non-zero exit if any binary check fails.
 
+**The book/intake date floor *(added v1.5)*.** `bookCutoff` is **derived from configuration, never hardcoded**:
+
+```ts
+const bookCutoff = addDays(asOf, -(intakeBuckets * bucketDays));   // 14 × 30 = 420 → asOf − 420
+```
+
+Book records are dated in `[bookCutoff − 5 years, bookCutoff]`; intake records in `(bookCutoff, asOf]`. **The binding invariant is asserted, not assumed:**
+
+```
+bookCutoff <= addDays(asOf, -395)
+```
+
+395 is the deepest date any intake query can reach — the Board's Year as-at window is `(asOf − 395, asOf − 365]` (§L.4.2). If `intakeBuckets` is later changed such that the cutoff rises above that line, the assertion fails rather than silently reintroducing contamination.
+
+> 📐 **Design Note — why the cutoff sits at 420 rather than at 395.** The requirement is **disjointness, not adjacency**: the cutoff need only sit at or before the deepest query reach. Engineer 2's 14-bucket scheme over-covers the window by 25 days, deliberately. Anchoring the cutoff to that floor leaves the bucket arithmetic **entirely unchanged**, and since book record dates are cosmetic and no population figure depends on them, **no rate moves and checks DD-4 through DD-8a and DD-21 need no re-verification.** Trimming intake to exactly 395 days would shift record counts and force all five to be re-run, for no gain. *The consequence, recorded so it is not later "cleaned up": roughly 200 intake records between `asOf − 420` and `asOf − 395` are reachable by no query. That is Engineer 2's safety margin, and removing it re-opens this.*
+
 **Two rules govern it absolutely.** The generator writes **only source attributes** — entity type, NAICS code, product, country, TM alert count, PEP status, business line, `onboardedAt`. Every derived field is written by the engine in the same pass. And when output misses a target, **the knobs move, never the rule** (DD §3); if the knobs cannot reach it, that is a flag to the Coordinator.
 
 > 🔧 **Implementation Note.** The generator emits source attributes *and* the engine's derived output into the same file, so the shipped fixture is self-describing and the record view needs no scoring at runtime. **The snapshot re-scores anyway** (§D.3.4) and asserts equality, because a fixture whose stored derivations disagree with the engine is the one failure mode that would put a wrong number on screen with everything else looking healthy.
@@ -482,7 +511,7 @@ These run on the Coordinator's machine, never on Vercel and never in the browser
 - **Responsibility:** take one customer's **source attributes** and return its points, score, rating, route and fired factors.
 - **Props / configuration:** none.
 - **State owned:** none. Pure.
-- **Lifecycle:** stateless; called ~4,850 times at startup.
+- **Lifecycle:** stateless; called once per record at startup (~5,250 on the current fixture).
 - **Inputs / outputs:** in — `CustomerSource`. Out — `{ points, score, scoredRating, rating, route, firedFactors }`.
 
 **Three properties the type system enforces.** The function takes source attributes only, so a caller *cannot* pass a pre-set band or rating. The jurisdiction and industry bands are resolved inside, from country and NAICS code. And `rating` is the higher of `scoredRating` and `pepFloor(pep)`, with `route: 'on score' | 'PEP escalation'` recording which produced it — the override is a floor, never a ceiling (CRRM §6).
@@ -546,16 +575,17 @@ These run on the Coordinator's machine, never on Vercel and never in the browser
 - **Props / configuration:** the snapshot, injected at construction.
 - **State owned:** a memo cache keyed by the serialised query. **This is an optimisation over the single derivation path, not a second store** (§E.1).
 - **Lifecycle:** constructed once; never re-created; the snapshot is frozen so the cache can never go stale.
-- **Inputs / outputs:** in — `CustomerQuery`. Out — a frozen array. `population: 'intake'` filters `onboardedAt` to `(asOf − windowDays, asOf]`; `population: 'book'` ignores `asOf` and `windowDays` entirely.
+- **Inputs / outputs:** in — `CustomerQuery`. Out — a frozen array. `population: 'intake'` filters `onboardedAt` to `(asOf − windowDays, asOf]`; `population: 'book'` resolves to `onboardedAt <= meta.bookCutoff` and ignores `asOf` and `windowDays` entirely. Neither filter excludes the other explicitly — they are disjoint by construction (§C.3).
 
 #### D.3.4 `src/data/snapshot.ts` *(closes ⚠️ A4)*
 - **Identity / path:** `buildSnapshot(): Snapshot`.
 - **Dependencies:** `src/generated/fixture.generated.json`, the engine, `types.ts`.
 - **Placement:** called by `main.tsx` **before** `createRoot().render()`.
-- **Responsibility:** load the fixture, re-score every record with the engine, assert agreement with the stored derivations, freeze the result, and expose `asOf` and provenance.
+- **Responsibility:** load the fixture, re-score every record with the engine, assert agreement with the stored derivations, assert the book/intake invariants, freeze the result, and expose `asOf` and provenance.
 - **Props / configuration:** none.
 - **State owned:** the snapshot, for the process lifetime. The single source of truth (§E.1).
-- **Lifecycle:** runs exactly once, synchronously, before React exists. Throws `FixtureLoadError` on a parse failure, a scoring disagreement or a reference-table assertion failure — the build's one error state (§D.5.23).
+- **Lifecycle:** runs exactly once, synchronously, before React exists. Throws `FixtureLoadError` on a parse failure, a scoring disagreement, a reference-table assertion failure, or a book/intake invariant failure — the build's one error state (§D.5.23).
+- **The book/intake invariants, asserted here *(added v1.5)*:** `bookCutoff <= addDays(asOf, -395)`; every record falls on exactly one side of the cutoff, so book and intake partition the snapshot; and the deepest intake window returns no record dated on or before `bookCutoff`. A failure is loud and named, because the alternative is a plausible wrong percentage on a tile.
 - **Inputs / outputs:** out — `{ records, asOf, meta }`, deeply frozen with `Object.freeze`.
 
 > 📐 **Design Note — why startup sequencing lives here and not on the interface (⚠️ A4).** DD §8 requires scoring before first paint and forbids lazy-loading the engine behind a spinner, but the data-access interface must not own startup or it acquires a lifecycle a backend implementation could not honour. Splitting them puts the one-time work in a function the composition root calls and leaves the interface a pure query surface. A backend implementation replaces `buildSnapshot` with an `await`ed fetch **before render** and changes no component. Rejected: scoring lazily inside `query()` (first paint would then depend on which surface rendered first); a React `Suspense` boundary (a loading state by another name, forbidden at the exact moment the 12-second criterion is measured).
@@ -825,7 +855,9 @@ interface SessionState {
 - **Lifecycle:** stateless.
 - **Inputs / outputs:** in — declarations. Out — the register.
 
-**The fresh-row rule, generically (⚠️ A8).** Walk the declarations in order; whenever `placement.group` differs from the previous element's, start a new row; pack up to three elements per row; separate groups by `--register-group-gap` and rows within a group by `--register-row-gap`. **The shell never names a group and never counts one.** Group order is the order of first appearance in the registry, so re-ordering groups is re-ordering declarations.
+**The fresh-row rule, generically (⚠️ A8).** Walk the declarations in order; pack up to three elements per row; start a new row when `placement.group` differs from the previous element's, **except where the outgoing group's remainder is a single element, in which case that element shares its row with the opening of the next group**; separate groups by `--register-group-gap` and rows within a group by `--register-row-gap`. **The shell never names a group and never counts one.** Group order is the order of first appearance in the registry, so re-ordering groups is re-ordering declarations.
+
+> 📐 **Design Note — the single-element exception is a Coordinator decision, not a defect *(23 August 2026)*.** A strict boundary break leaves *Recordkeeping* alone on a row of three, which reads as ragged rather than as a group boundary, and the row it occupies costs vertical budget the tile band needs. **The Coordinator ruled on legibility and integration:** the board should read as one object rather than as a partially-filled grid, and group separation still carries the exam-manual grouping through the gap ledger. **This is the as-built arrangement, it is correct, and a future Engineer should not "fix" it back.** The expected arrangement is enumerated at §L.4.5 and asserted mechanically by check **TAD-22** (§L.3), so an accidental change fails the run while the deliberate one stands. *Rejected: an orphan-avoidance heuristic expressed as a general rule — with 24 elements in six fixed groups there is exactly one place it can trigger, so a general rule would be a generalisation of a single case, and the founding razor says state the case.*
 
 **Cross-row field alignment (⚠️ A10).** Every register row is a CSS grid on a **fixed column template** — `var(--mark-size) var(--register-title-width) 1fr var(--trend-size)` — so all 24 rows align by construction, in all three columns, with nothing measuring anything.
 
@@ -1175,7 +1207,7 @@ Board content arrives as generated declarations (§D.1.1). In-product strings li
 
 1. **Accessibility.** Keyboard operability of the core loop with the focus order fixed by DD §4: `Program Element → Time Horizon → About`, then on the Board `Customers tile`, and in the module `business lines left to right → rating filter → close → pagination when present`. Focus rings are `--focus-ring` at `--focus-ring-offset` on every interactive element. **The 24 inactive elements are not focusable, which is itself the honesty signal.** Record rows are not focusable and the table is not a scroll region. The About modal is the only focus trap. All motion respects `prefers-reduced-motion`, which the token file implements by zeroing the three duration tokens — so honouring it requires no component to check anything.
 2. **Responsive posture.** None, by decision. One canvas, scaled uniformly (§C.5). No breakpoints, no fluid type ramp, nothing to maintain.
-3. **Performance.** Two runtime dependencies; no chart library; one self-hosted variable font preloaded from the same origin. Scoring ~4,850 records runs synchronously before first paint — measured in milliseconds for arithmetic of this shape, and it is the reason no loading state exists. The fixture ships as JSON in the bundle. **No hard budget is set; the commitment is that the board paints complete on first paint**, which the cold-load check verifies directly.
+3. **Performance.** Two runtime dependencies; no chart library; one self-hosted variable font preloaded from the same origin. Scoring ~5,250 records runs synchronously before first paint — measured in milliseconds for arithmetic of this shape, and it is the reason no loading state exists. The fixture ships as JSON in the bundle. **No hard budget is set; the commitment is that the board paints complete on first paint**, which the cold-load check verifies directly.
 4. **Determinism.** The generator is seeded; the fixture is generated once and committed; the snapshot is frozen; every displayed number is a pure function of it. **The demo cannot vary between rehearsal and the room.**
 5. **Public deployment and no secrets.** Nothing sensitive ships. All data is synthetic, **no customer names at all** (a DD supersession of the Form's "fake names only"), no real institution depicted. The deployment is public by Coordinator decision; the protection is the synthetic-data lock, not obscurity. `public/robots.txt` carries a `noindex` directive so a board of plausible bank records does not accumulate search traffic — two lines, phase 1.
 
@@ -1294,7 +1326,7 @@ The About modal with the approved text pasted verbatim · the focus-order pass e
 
 ### L.3 Verification hooks — `npm run check`
 
-Every mechanically checkable claim, in one script, each printing a pass/fail line. **These are cited elsewhere in this document as TAD-1 … TAD-19**, never as bare numbers, to keep them distinct from DD §3's twenty-two fixture checks (**DD-1 … DD-22**, §H.4).
+Every mechanically checkable claim, in one script, each printing a pass/fail line. **These are cited elsewhere in this document as TAD-1 … TAD-22**, never as bare numbers, to keep them distinct from DD §3's twenty-two fixture checks (**DD-1 … DD-22**, §H.4).
 
 **Structure (grep-shaped).**
 1. No file outside `src/data/` imports `src/generated/fixture.generated.json`.
@@ -1324,6 +1356,13 @@ Every mechanically checkable claim, in one script, each printing a pass/fail lin
 
 **Fixture (phase 2 onward).**
 19. The twenty-two **DD-checks** of DD §3, reported individually; the binary ones fail the run, **DD-9** reports only.
+
+**Populations *(added v1.5)*.**
+20. `bookCutoff <= addDays(asOf, -395)`, and book and intake partition the snapshot with no record on both sides and none on neither.
+21. The deepest intake window — the Board's Year as-at — returns no record dated on or before `bookCutoff`. *This is the check that would have caught the contamination.*
+
+**Layout *(added v1.5)*.**
+22. The register's rendered arrangement matches §L.4.5's ten-row table, row by row and element by element. *(This check knows content, which is permitted in the check script and forbidden in the shell — §K.2.3 is unaffected.)*
 
 ### L.4 Precomputed values and exact algorithms
 
@@ -1356,6 +1395,8 @@ const addDays = (d: IsoDate, n: number): IsoDate => {
 
 The Board's window is **always 30 days** and only its `asOf` moves; the module's `asOf` is **always the snapshot's** and only its window moves. Month resolves to an identical query in both, which is why the two contexts agree at 11.0% structurally (§F.7).
 
+**The deepest reach of any intake query is the Board's Year as-at — `(asOf − 395, asOf − 365]`.** That figure is what `bookCutoff` is asserted against (§D.1.2), and it is why the fixture must carry more than 365 days of intake: the Board's Year window lies *entirely outside* the module's Year window, and a generator producing only 365 days would leave it short.
+
 #### L.4.3 Element ids
 
 Derived once at transcription, written into the generated JSON, and never re-derived at runtime:
@@ -1375,19 +1416,26 @@ Worked: `Exam / Audit Mgmt.` → `exam-audit-mgmt` · `Models & Non-model Tools`
 
 #### L.4.5 Register packing, with its arithmetic
 
-Walk declarations in registry order; start a fresh row when `placement.group` changes; pack up to three per row. That produces, from the six groups' element counts:
+Walk declarations in registry order; pack up to three per row; break on group change, with the single-element exception at §D.5.16. **The expected arrangement is enumerated rather than derived**, because it is the arrangement itself that is authoritative:
 
-| Group | Elements | Rows |
+| Row | Elements | Group(s) |
 |---|---|---|
-| Risk Assessments | 2 | 1 |
-| Core pillars | 5 | 2 |
-| FCC Programs | 2 | 1 |
-| Program infrastructure | 8 | 3 |
-| Data, models and records | 4 | 2 |
-| Governance and Reporting | 3 | 1 |
-| **Total** | **24** | **10** |
+| 1 | EWRA · Emerging Risk | Risk Assessments |
+| 2 | KYC · EDD · TM | Core pillars |
+| 3 | Investigations · Regulatory Reporting | Core pillars |
+| 4 | Sanctions Program · ABC Program | FCC Programs |
+| 5 | Screening · Governance · Staffing | Program infrastructure |
+| 6 | Training · QA · Exam / Audit Mgmt. | Program infrastructure |
+| 7 | Issue Mgmt. · Change Mgmt. | Program infrastructure |
+| 8 | Data Management · Models & Non-model Tools · Information Sharing | Data, models and records |
+| 9 | Recordkeeping · FCC Risk Appetite Statement | **Data + Governance** — the single-element exception |
+| 10 | Board Reporting · Risk Committee Reporting | Governance and Reporting |
 
-Which reconciles with the Design System spec §2 budget exactly: 10 rows × 57 = **570** · four within-group gaps × 8 = **32** (a group of *r* rows contributes *r−1*) · five group separations × 24 = **120** · two band labels × 48 = **96** · one band separation × 24 = **24** · tile band **140** · total **982** against 1016. **If an Author's packing does not produce ten rows, something is wrong before any pixel is inspected.**
+**Ten rows, 24 elements.** Check **TAD-22** asserts this table row by row.
+
+> 🔧 **Implementation Note — why a total-row count is not the check, and how this document learned it.** Through v1.4 this section said *"if the packing does not produce ten rows, something is wrong before any pixel is inspected."* The as-built arrangement produces ten rows and moves an element between them, so a total-only check cannot see the difference — and the vertical budget still fits, so the fit check passes too. **A count is not an arrangement.** The assertion is therefore per-row membership, which is the property that actually matters.
+
+**Consequence for the vertical budget, to be confirmed at the phase 1 exit.** The Design System spec §2 ledger assumed a strict boundary break: 570 (10 × 57) · **four** within-group gaps × 8 = 32 · **five** group separations × 24 = 120 · 96 · 24 · 140 = **982 against 1016, slack 34**. On the as-built arrangement one boundary gap becomes a within-group gap, so the ledger reads **five × 8 = 40** and **four × 24 = 96**, giving **966 and slack 50** — a recovery of 16 canvas, which is the space the arrangement was chosen to protect. **The Engineer confirms the actual ledger and reports it to the Design System owner at the re-engagement**, since a larger reserve changes what the scrim verification can absorb. **No token changes on this account without a Touch Two amendment;** `--tile-band-height` stands at 140 unless amended.
 
 #### L.4.6 Number formatting — `lib/format.ts`
 
@@ -1416,6 +1464,7 @@ export interface ComputeContext { readonly horizon: Horizon; readonly data: Cust
 export interface RegulatoryAlignment { readonly document: string; readonly citation: string }
 export interface SnapshotMeta {
   readonly asOf: IsoDate;
+  readonly bookCutoff: IsoDate;          // records on or before this date are the established book (§C.3)
   readonly generatedAt: IsoDate;
   readonly randomSeed: number;
   readonly jurisdictionSource: { source: string; edition: string; accessed: IsoDate; threshold: string };
@@ -1453,6 +1502,7 @@ That split is what keeps the shell generic: the shell provides storage typed `un
 
 | Version | Date | Change |
 |---|---|---|
+| **1.5** | **24 Aug 2026** | **Construction amendment, phase 3 — and a divergence reconciliation.** Two amendments drafted chat-side on 23 and 24 August were numbered 1.2 and 1.3 against a working copy while the repository independently took 1.2, 1.3 and 1.4. Both are re-applied here onto the repository text, which is canonical; the chat-side numbering is void and no document carries it. **(a) The book/intake split.** `population: 'book'` had no honest implementation — book membership lived in a generator-internal reference-number set never written to the shipped fixture, and book records carried cosmetic dates with no floor, contaminating the Quarter and Year intake windows by 37 and 30 records and moving Year from a true 5.00% to a reported 5.93%. Found by Engineer 3 in phase 3 and **corrected at source in the generator, not filtered in the data layer.** `population` is now a date predicate over one record set; `SnapshotMeta` gains `bookCutoff`, derived from configuration with `bookCutoff <= addDays(asOf, -395)` asserted; the generator floors book dates at the cutoff; the snapshot asserts the partition at startup; checks **TAD-20** and **TAD-21** added. Rejected: a `segment` field on the record, and a reference-number boundary — both recorded at §C.3. The seed-contract interface `CustomerQuery` / `CustomerDataAccess` is unchanged; `SnapshotMeta` gains one field. **(b) The register arrangement.** The single-element exception at the *Data* / *Governance* boundary is a **Coordinator layout decision of 23 August**, taken on legibility and vertical budget, not a defect: §D.5.16 and §L.4.5 now state it, and check **TAD-22** asserts the arrangement row by row. §L.4.5's total-row-count heuristic is withdrawn — it could not distinguish the two arrangements — and replaced by an enumerated table. No component contract, phase or exit condition moves. |
 | **1.4** | **24 Aug 2026** | **Construction amendment, phase 2.** Closes a placement gap §D.1.1b left open: §B.2's repository tree listed the three Appendix B workbooks under `content/` but never added `Country_Risk_Ratings_20AUG26.docx`, though §D.1.1b names it as `generate-jurisdictions.ts`'s dependency without a path. Committed to `content/Country_Risk_Ratings_20AUG26.docx`, alongside its sibling canonical sources, per Coordinator direction. No other architectural change. |
 | 0.1 | 21 Aug 2026 | First full draft from DD v0.9.2. Twenty-two flags closed in §F; three items raised — Recharts as amend-upstream, the register line-2 overrun, and the missing `--register-title-width` token. |
 | 0.2 | 21 Aug 2026 | Coordinator's revised Appendix B workbooks incorporated, closing the line-2 overrun at source. Designer's note accepted: `OverflowSentinel` runs against the deployed board, not development only. §L.4 added — every value and algorithm an Author would otherwise have to decide. |

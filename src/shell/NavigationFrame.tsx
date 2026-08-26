@@ -39,10 +39,15 @@ export function NavigationFrame(): JSX.Element {
 // component stays token-driven, per check.ts's TAD-4 — the delivered
 // file's two colors are numerically identical to these two tokens).
 // Never recoloured, rotated, or stretched beyond this (§3.2). The mark
-// sits above the wordmark, stacked rather than side-by-side, since the
-// lockup's own side-by-side proportions (780x160, ~42px text) are built
-// for a wide banner placement and don't fit the frame's 240-canvas clear
-// width — flagged back to the Coordinator rather than assumed.
+// sits above the wordmark, stacked rather than side-by-side. Settled,
+// 26 Aug 2026: FCC_lockup_final.svg's side-by-side proportions (780x160,
+// ~42px text) are built for a wide banner placement, not the frame's
+// 240-canvas clear width; verified below at --brand-mark-size (88px) plus
+// wordmark, the stacked arrangement fits with margin at the frame's
+// actual dimensions, so the reference lockup's own proportions were never
+// going to apply here regardless of arrangement. Confirmed by the
+// Coordinator rather than left as an open flag against the reference
+// asset — no lockup SVG is used; mark and wordmark are composed directly.
 function BrandBlock(): JSX.Element {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>

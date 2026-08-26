@@ -26,6 +26,13 @@ import type { Composition } from './selectors.ts';
 // narrower than that, three-character text starts to crowd or overflow
 // its own segment. Label ink per fcc-tokens.css §6: --ink-primary on low
 // and medium, --surface (light on dark) on high.
+//
+// CONFIRMED as intended behaviour, not a shortcut to tidy later (Design
+// System owner review, verified at magnification, 26 Aug 2026): the
+// dominant segment's label inline plus the narrow ones stacked below the
+// bar ("High 5% Medium 3%") reads more cleanly than a crowded bar and
+// keeps Rule E satisfied at every width — better than the spec's own
+// "adjacent" framing anticipated, and should stay this way into phase 6.
 const INLINE_LABEL_THRESHOLD = 8;
 
 interface Segment {

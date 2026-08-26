@@ -34,11 +34,18 @@ const cellStyle = {
 function RecordRow({ record }: { record: CustomerRecord }): JSX.Element {
   return (
     <tr>
+      {/* Reference stays fully visible — it's the traceability handle
+          the drill-down exists to expose, not identifying detail. */}
       <td style={cellStyle}>{record.reference}</td>
       {/* The redaction treatment — a greyed field with no display text
-          (§D.6.9). There is no customer name in this data model at all;
-          the cell exists to show what a real deployment would redact,
-          not to hide a value this fixture actually has. */}
+          (§D.6.9) — sits on Customer, not Reference. This differs from
+          the Touch Two state inventory, which put it on Reference;
+          CONFIRMED as the correct, deliberate design intent by the
+          Coordinator, 26 Aug 2026, not a silent divergence: "no customer
+          names, just a customer identifier." There is no customer name
+          in this data model at all — CustomerSource carries no such
+          field — so the cell exists to show what a real deployment
+          would redact, not to hide a value this fixture actually has. */}
       <td>
         <span style={{ display: 'inline-block', width: '100%', height: '1em', background: 'var(--surface-edge)', borderRadius: 2 }} />
       </td>

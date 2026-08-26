@@ -71,10 +71,13 @@ function ComparisonGroup({
 
 // TAD §D.6.5 (closes A18, part) — eight bars in four pairs at full
 // height (the whole book, then each business line, book above / recent
-// intake below); four bars collapsed (the whole-book anchor persists,
-// the per-line book bars drop out). The collapse changes what's
-// displayed, not merely its size — a content transition, not a CSS one
-// (§D.6.5's Implementation Note).
+// intake below); four bars collapsed (the whole-book GROUP persists as
+// a row — unlike the per-line book bars, which drop out — but its
+// MEASURE does not change: every collapsed bar shows Recent intake, so
+// the four collapsed bars are directly comparable. See the fix note on
+// the Whole Book group below for the defect this corrects.) The collapse
+// changes what's displayed, not merely its size — a content transition,
+// not a CSS one (§D.6.5's Implementation Note).
 export function Comparison({
   state,
   dispatch,
@@ -99,10 +102,32 @@ export function Comparison({
         <ComparisonGroup
           groupLabel="Whole Book"
           book={collapsed ? null : wholeBook}
-          // Collapsed, the whole-book row is the standing anchor — its
-          // own book composition, not the intake aggregate (§D.6.5:
-          // "the whole-book anchor persists in both states").
-          recent={collapsed ? wholeBook : wholeRecent}
+          // FIX, 26 Aug 2026 (Design System owner review, verified at
+          // magnification): this used to show wholeBook here, on the
+          // premise that "the whole-book anchor persists in both states"
+          // (§D.6.5) meant the anchor's own measure carries over
+          // unchanged. It doesn't — that phrase describes which
+          // STRUCTURAL row survives collapse (the whole-book group,
+          // unlike the per-line book bars, which drop out), not which
+          // MEASURE it displays. The bug: collapsed, Whole Book was
+          // showing its Book composition while Retail/Commercial/AM
+          // showed Recent intake — comparing unlike things with nothing
+          // on screen saying so, which inverts the point of the
+          // comparison (book vs. recent intake diverging). All four
+          // collapsed bars now show the same measure, Recent intake.
+          //
+          // One asymmetry deliberately left in place, not overlooked:
+          // selecting "Whole Book" still opens Records against
+          // population 'book' (the true 2,000-record established book,
+          // ignoring horizon), not the intake aggregate this bar now
+          // displays. The three lines don't have this gap — their
+          // collapsed bar and their Records population are the same
+          // query. RecordsPanel's own header is always live-computed, so
+          // what opens is correct on its own terms; it just won't
+          // numerically match the bar you clicked to get there. Recorded
+          // here rather than silently accepted, since it's the same
+          // category of thing this fix was for.
+          recent={wholeRecent}
           collapsed={collapsed}
           selected={state.selectedLine === 'book'}
           onSelect={() => selectLine('book')}

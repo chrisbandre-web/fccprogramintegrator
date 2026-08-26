@@ -25,7 +25,7 @@ function LegendItem({ entry }: { entry: LegendEntry }): JSX.Element {
   }
   return (
     <div>
-      <div style={{ font: 'var(--weight-semibold) var(--type-legend) / var(--leading-tight) var(--font-family)', color: 'var(--ink-secondary)', marginBottom: 4 }}>
+      <div style={{ font: 'var(--weight-semibold) var(--type-legend) / var(--leading-tight) var(--font-family)', color: 'var(--ink-secondary)', marginBottom: 'var(--space-1)' }}>
         {entry.label}
       </div>
       {/* Design System owner's spec, 26 Aug 2026: 16 canvas / 12 rendered
@@ -36,7 +36,7 @@ function LegendItem({ entry }: { entry: LegendEntry }): JSX.Element {
           ground is visible unaided post-Amendment 1, and a keyline would
           read the low swatch as a different kind of object from the
           other two. */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
         {entry.steps.map((s) => (
           <div key={s.rating} style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
             <span style={{ width: 16, height: 16, flexShrink: 0, background: RATING_FILL[s.rating], borderRadius: 2 }} />

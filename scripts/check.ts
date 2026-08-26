@@ -436,6 +436,72 @@ function addDaysCheck(d: string, n: number): string {
   return new Date(Date.UTC(y, m - 1, day + n)).toISOString().slice(0, 10);
 }
 
+// --- TAD-23 (§L.4.5, §D.5.16) — the register's exact enumerated       --
+// arrangement, including the single-element exception. Reserved as an   --
+// open slot when TAD-21/22 were added (v1.5's own numbering collided    --
+// with the pre-existing TAD-20); built now, 26 Aug 2026, alongside the  --
+// fix -- RegisterField.tsx never actually implemented the exception,    --
+// only the strict break, despite it being Coordinator-approved since    --
+// 23 August. This is what stops that regressing silently again.        --
+const EXPECTED_REGISTER_ARRANGEMENT: readonly (readonly string[])[] = [
+  ['ewra', 'emerging-risk'],
+  ['kyc', 'edd', 'tm'],
+  ['investigations', 'regulatory-reporting'],
+  ['sanctions-program', 'abc-program'],
+  ['screening', 'governance', 'staffing'],
+  ['training', 'qa', 'exam-audit-mgmt'],
+  ['issue-mgmt', 'change-mgmt'],
+  ['data-management', 'models-non-model-tools', 'information-sharing'],
+  ['recordkeeping', 'risk-appetite-statement'],
+  ['board-reporting', 'risk-committee-reporting'],
+];
+
+function checkRegisterArrangement(): void {
+  const path = join(ROOT, 'src', 'generated', 'declarations.generated.json');
+  try {
+    const doc = JSON.parse(readFileSync(path, 'utf-8')) as {
+      declarations: { id: string; status: string; placement: { band: string; group: string | null } }[];
+    };
+    const register = doc.declarations.filter((d) => d.placement.band === 'program-elements');
+
+    // Reproduce packIntoRows' algorithm exactly (RegisterField.tsx), over
+    // the generated data rather than importing the .tsx component.
+    const clusters: { group: string | null; items: string[] }[] = [];
+    for (const d of register) {
+      const last = clusters[clusters.length - 1];
+      if (!last || last.group !== d.placement.group) clusters.push({ group: d.placement.group, items: [d.id] });
+      else last.items.push(d.id);
+    }
+    const rows: string[][] = [];
+    let pending: string[] = [];
+    clusters.forEach((cluster, i) => {
+      const remaining = [...cluster.items];
+      if (pending.length > 0) {
+        rows.push([...pending, ...remaining.splice(0, 1)]);
+        pending = [];
+      }
+      while (remaining.length > 3) rows.push(remaining.splice(0, 3));
+      const isLast = i === clusters.length - 1;
+      if (remaining.length === 1 && !isLast) pending = remaining;
+      else if (remaining.length > 0) rows.push(remaining);
+    });
+    if (pending.length > 0) rows.push(pending);
+
+    const matches =
+      rows.length === EXPECTED_REGISTER_ARRANGEMENT.length &&
+      rows.every((row, i) => JSON.stringify(row) === JSON.stringify(EXPECTED_REGISTER_ARRANGEMENT[i]));
+
+    record(
+      'TAD-23',
+      "The register's exact enumerated arrangement (§L.4.5), including the single-element exception at the Data/Governance boundary",
+      matches,
+      matches ? '' : `got ${JSON.stringify(rows)}`,
+    );
+  } catch (e) {
+    record('TAD-23', "The register's exact enumerated arrangement (§L.4.5)", false, String(e));
+  }
+}
+
 // --- Build itself -----------------------------------------------------------
 
 function checkBuild(): void {
@@ -464,6 +530,7 @@ await checkPepFloorNeverCeiling();
 await checkJurisdictionTable();
 await checkFixtureDdGate();
 await checkPopulationInvariants();
+checkRegisterArrangement();
 checkTypecheck();
 checkLint();
 checkVitest();

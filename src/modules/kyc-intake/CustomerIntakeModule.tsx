@@ -36,7 +36,7 @@ export function CustomerIntakeModule(): JSX.Element {
       </div>
       {state.selectedLine !== null && (
         <div style={{ flex: '1 1 70%', borderTop: '1px solid var(--surface-edge)' }}>
-          <RecordsPanel selectedLine={state.selectedLine} />
+          <RecordsPanel state={state} dispatch={dispatch} selectedLine={state.selectedLine} />
         </div>
       )}
     </div>

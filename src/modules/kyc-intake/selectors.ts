@@ -5,7 +5,7 @@
 // Comparison's compositions. The record page (phase 5) is this file's
 // next addition.
 import type { CustomerDataAccess } from '../../data/dataAccess.ts';
-import type { BusinessLine, CustomerQuery, Horizon, IsoDate } from '../../data/types.ts';
+import type { BusinessLine, CustomerQuery, CustomerRecord, Horizon, IsoDate, Rating } from '../../data/types.ts';
 
 /**
  * TAD §D.6.1: the Board's as-at High share — population 'intake', queried
@@ -59,5 +59,51 @@ export function intakeComposition(data: CustomerDataAccess, horizon: Horizon, bu
   const windowDays = HORIZON_WINDOW_DAYS[horizon];
   const base: CustomerQuery = businessLine ? { population: 'intake', windowDays, businessLine } : { population: 'intake', windowDays };
   return compositionFromQuery(data, base);
+}
+
+// TAD §D.6.8 — page size lives here, not on the data-access interface: a
+// presentational concern (how many rows a panel shows at once) kept out
+// of the contract a real backend would also have to implement.
+export const RECORDS_PAGE_SIZE = 25;
+
+export interface RecordPage {
+  readonly records: readonly CustomerRecord[]; // this page's slice, up to RECORDS_PAGE_SIZE
+  readonly total: number; // the full matching count, before slicing
+}
+
+function baseQueryFor(selectedLine: 'book' | BusinessLine, horizon: Horizon): CustomerQuery {
+  return selectedLine === 'book'
+    ? { population: 'book' }
+    : { population: 'intake', windowDays: HORIZON_WINDOW_DAYS[horizon], businessLine: selectedLine };
+}
+
+/**
+ * TAD §D.6.8: the panel's count header reads "N {rating}-rated of M
+ * onboarded" — M is this unfiltered population total, independent of
+ * whatever the rating filter currently selects.
+ */
+export function populationCount(data: CustomerDataAccess, selectedLine: 'book' | BusinessLine, horizon: Horizon): number {
+  return data.count(baseQueryFor(selectedLine, horizon));
+}
+
+/**
+ * TAD §D.6.8: the Records panel's result set. 'book' ignores horizon
+ * entirely (population 'book' does too, §C.3); a business line queries
+ * intake at the module's current horizon window. rating: 'All' omits the
+ * rating filter from the query rather than passing an invalid value.
+ */
+export function recordPage(
+  data: CustomerDataAccess,
+  selectedLine: 'book' | BusinessLine,
+  rating: Rating | 'All',
+  horizon: Horizon,
+  page: number, // 1-based
+): RecordPage {
+  const base = baseQueryFor(selectedLine, horizon);
+  const query: CustomerQuery = rating === 'All' ? base : { ...base, rating };
+
+  const all = data.query(query);
+  const start = (page - 1) * RECORDS_PAGE_SIZE;
+  return { records: all.slice(start, start + RECORDS_PAGE_SIZE), total: all.length };
 }
 

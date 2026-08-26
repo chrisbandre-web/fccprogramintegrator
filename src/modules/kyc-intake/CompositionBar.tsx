@@ -14,7 +14,39 @@ import type { Composition } from './selectors.ts';
 // before it reaches the group's own handler, since disabled form controls
 // don't dispatch (and in most browsers don't bubble) click events. Found
 // live, 24 Aug 2026 — clicking a bar did nothing.
+//
+// Touch Two Amendment 1 §3 — the Comparison's segments must carry their
+// own percentage value; a sidebar key names what the colours mean in
+// general, not what this segment is. Each segment shows its value where
+// it's wide enough to hold the type at the 12.0-rendered floor;
+// otherwise the value moves adjacent to the bar rather than being
+// dropped. Percentage-of-bar-width stands in for a real DOM measurement
+// here (no ResizeObserver) — 8% is comfortably wide enough for "12%" at
+// --type-legend in every container width this build actually renders at;
+// narrower than that, three-character text starts to crowd or overflow
+// its own segment. Label ink per fcc-tokens.css §6: --ink-primary on low
+// and medium, --surface (light on dark) on high.
+const INLINE_LABEL_THRESHOLD = 8;
+
+interface Segment {
+  key: 'high' | 'medium' | 'low';
+  pct: number;
+  fill: string;
+  ink: string;
+}
+
+function segmentLabel(pct: number): string {
+  return `${Math.round(pct)}%`;
+}
+
 export function CompositionBar({ label, composition }: { label: string; composition: Composition }): JSX.Element {
+  const segments: Segment[] = [
+    { key: 'high', pct: composition.high, fill: 'var(--risk-bar-high)', ink: 'var(--surface)' },
+    { key: 'medium', pct: composition.medium, fill: 'var(--risk-bar-medium)', ink: 'var(--ink-primary)' },
+    { key: 'low', pct: composition.low, fill: 'var(--risk-bar-low)', ink: 'var(--ink-primary)' },
+  ];
+  const overflow = composition.total > 0 ? segments.filter((s) => s.pct > 0 && s.pct < INLINE_LABEL_THRESHOLD) : [];
+
   return (
     <div>
       {label && (
@@ -40,14 +72,45 @@ export function CompositionBar({ label, composition }: { label: string; composit
           background: 'var(--surface-edge)',
         }}
       >
-        {composition.total > 0 && (
-          <>
-            <div style={{ width: `${composition.high}%`, background: 'var(--risk-bar-high)' }} />
-            <div style={{ width: `${composition.medium}%`, background: 'var(--risk-bar-medium)' }} />
-            <div style={{ width: `${composition.low}%`, background: 'var(--risk-bar-low)' }} />
-          </>
-        )}
+        {composition.total > 0 &&
+          segments.map((s) => (
+            <div
+              key={s.key}
+              style={{
+                width: `${s.pct}%`,
+                background: s.fill,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+              }}
+            >
+              {s.pct >= INLINE_LABEL_THRESHOLD && (
+                <span
+                  style={{
+                    font: 'var(--weight-semibold) var(--type-legend) / var(--leading-tight) var(--font-family)',
+                    color: s.ink,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {segmentLabel(s.pct)}
+                </span>
+              )}
+            </div>
+          ))}
       </div>
+      {overflow.length > 0 && (
+        <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 2 }}>
+          {overflow.map((s) => (
+            <span
+              key={s.key}
+              style={{ font: 'var(--weight-regular) var(--type-legend) / var(--leading-tight) var(--font-family)', color: 'var(--ink-tertiary)' }}
+            >
+              {s.key[0]!.toUpperCase() + s.key.slice(1)} {segmentLabel(s.pct)}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

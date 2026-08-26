@@ -282,3 +282,25 @@
 .horizon-value[data-selected='true'] .horizon-value__rule {
   background: var(--accent);
 }
+
+/* TAD §D.6.8 — RecordsPanel "opens on selection with --motion-reveal."
+   The inline `animation: var(--motion-reveal)` this replaced supplied a
+   duration/timing-function with no animation-name, which resolves to
+   animation-name: none — CSS-valid but a no-op, so the panel opened with
+   no reveal at all. --motion-reveal already zeroes under
+   prefers-reduced-motion via its own token definition, so this needs no
+   separate reduced-motion branch. */
+@keyframes records-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(var(--space-1));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.records-reveal {
+  animation: records-reveal var(--motion-reveal);
+}

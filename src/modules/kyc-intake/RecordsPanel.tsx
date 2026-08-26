@@ -45,7 +45,7 @@ export function RecordsPanel({
       : `${page.total.toLocaleString()} ${state.rating}-rated of ${total.toLocaleString()} onboarded, ${lineLabel}`;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', animation: 'var(--motion-reveal)' }}>
+    <div className="records-reveal" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <div
         style={{
           display: 'flex',

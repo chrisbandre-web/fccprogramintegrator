@@ -30,6 +30,19 @@
    scrim (secondary fails AA at 4.14:1 at the current 0.28 opacity — see
    fcc-tokens.css for the authoritative, current numbers). Enforced here,
    in the one class, rather than trusted to 24 call sites.
+
+   ONE VALUE, DELIBERATELY, FOR BOTH SURFACES (26 Aug 2026). Raised as a
+   possible inconsistency: a wide flat register row visibly veils more
+   strongly than a small bounded tile at the same opacity, purely because
+   more veiled area sits adjacent to unveiled ground — confirmed the two
+   surfaces run byte-for-byte identical CSS, so the difference (if any) is
+   perceptual, not a bug. Settled by looking, not by computing further —
+   the same method that set 0.28 in the first place (fcc-tokens.css §3):
+   the Coordinator compared 0.28 against three lighter register-only
+   candidates (0.24 / 0.20 / 0.16) on real content and confirmed 0.28
+   directly — lighter read as less clearly non-operational, and 0.28
+   remains fully legible on both surfaces. No second scrim value exists;
+   --scrim is intentionally the one value for both.
    --------------------------------------------------------------------------- */
 .scrim {
   position: relative;

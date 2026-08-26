@@ -1,6 +1,6 @@
 /* =============================================================================
    FCC Program Integrator — Design System tokens
-   Touch Two · v1.2 · amended 25 August 2026 · Art Director / Design System owner
+   Touch Two · v1.3 · amended 26 August 2026 · Art Director / Design System owner
 
    THE ONE TOKEN FILE. Every value the build uses lives here. No component
    hardcodes a value this file defines. Role names are the vocabulary the
@@ -156,6 +156,15 @@
                                    frame control. It is the only control a viewer
                                    is asked to operate during the demo.        */
   --type-frame-label:    16px;  /* 12.0  — Program Element / Time Horizon      */
+  --type-composition-label: 18px; /* 13.5 — v1.3: the Comparison's segment values,
+                                   inline and stacked-below. These are DATA, not
+                                   chrome: they are what makes encoding 4
+                                   label-bearing under Rule E, so they are sized
+                                   one step above the Records table rather than
+                                   at the legend floor. Deliberately NOT
+                                   --type-body: same value, different job, and
+                                   coupling them would let an About-copy change
+                                   silently resize chart labels.               */
   --type-legend:         16px;  /* 12.0                                      */
   --type-table:          16px;  /* 12.0                                      */
   --type-body:           18px;  /* 13.5  — About modal                       */
@@ -198,6 +207,17 @@
   --register-columns:         3;
   --register-column-width: 509px;
   --register-column-gap:   24px;
+
+  /* --- v1.3: the Comparison ------------------------------------------------- */
+  --comparison-bar-height: 24px;  /* 18 rendered. Coupled to
+                                     --type-composition-label: an 18px label has a
+                                     13.1 canvas cap height, so a 20px bar leaves
+                                     only 2.6 rendered px of clearance and the
+                                     label reads as jammed in. 24 gives 4.1.
+                                     If the label size changes, re-check this.  */
+  /* The inline/stacked label threshold (~9% of bar width) lives in component
+     code, not here: it is derived from label width against bar width, and is
+     confirmed visually at magnification rather than computed. */
   --register-row-height:   57px;  /* 42.75 rendered — line1 25 + line2 20 + 6+6 padding */
   --register-row-gap:       8px;  /* within a group */
   --register-title-width: 232px;  /* AMENDMENT 1: promoted from a local override.

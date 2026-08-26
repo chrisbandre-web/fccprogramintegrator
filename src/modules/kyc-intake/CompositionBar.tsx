@@ -18,22 +18,43 @@ import type { Composition } from './selectors.ts';
 // Touch Two Amendment 1 §3 — the Comparison's segments must carry their
 // own percentage value; a sidebar key names what the colours mean in
 // general, not what this segment is. Each segment shows its value where
-// it's wide enough to hold the type at the 12.0-rendered floor;
-// otherwise the value moves adjacent to the bar rather than being
-// dropped. Percentage-of-bar-width stands in for a real DOM measurement
-// here (no ResizeObserver) — 8% is comfortably wide enough for "12%" at
-// --type-legend in every container width this build actually renders at;
-// narrower than that, three-character text starts to crowd or overflow
-// its own segment. Label ink per fcc-tokens.css §6: --ink-primary on low
-// and medium, --surface (light on dark) on high.
+// it's wide enough to hold the type at --type-composition-label's
+// rendered size; otherwise the value moves adjacent to the bar rather
+// than being dropped. Label ink per fcc-tokens.css §6: --ink-primary on
+// low and medium, --surface (light on dark) on high.
 //
-// CONFIRMED as intended behaviour, not a shortcut to tidy later (Design
-// System owner review, verified at magnification, 26 Aug 2026): the
-// dominant segment's label inline plus the narrow ones stacked below the
-// bar ("High 5% Medium 3%") reads more cleanly than a crowded bar and
-// keeps Rule E satisfied at every width — better than the spec's own
-// "adjacent" framing anticipated, and should stay this way into phase 6.
-const INLINE_LABEL_THRESHOLD = 8;
+// --type-composition-label, not --type-legend (Design System owner
+// ruling, 26 Aug 2026, v1.3): these values are DATA, not chrome -- they
+// are what makes this encoding label-bearing under Rule E -- so they are
+// sized one step above the legend floor, deliberately as their own named
+// token rather than reusing --type-body (same value, different job;
+// coupling them would let an About-copy change silently resize chart
+// labels). The bar's own height moved from 20 to --comparison-bar-height
+// (24px) in the same amendment, coupled to this: an 18px label has a
+// 13.1 canvas cap height, and a 20px bar left only 2.6 rendered px of
+// clearance -- 24 gives 4.1.
+//
+// The inline/stacked threshold below is a PERCENTAGE OF BAR WIDTH, not a
+// pixel measurement -- it works today because the bar's own width is
+// fixed by the field it lives in (Design System owner note, 26 Aug
+// 2026). If that field's width ever becomes variable, this threshold
+// must be re-derived from pixels against the label's actual rendered
+// width, not carried forward as the same percentage.
+//
+// Threshold recalibrated 8 -> 9 alongside the type bump (roughly
+// proportional to the ~12.5% size increase). This is a calculated
+// estimate, not a visually confirmed one -- per the Design System
+// owner's own instruction, the real number should be verified against
+// the deployed build at magnification, not computed in the abstract,
+// and that verification is still outstanding as of this commit.
+//
+// Separately, nothing narrower than the threshold can produce a label
+// wider than "XX%" regardless of where the threshold sits:
+// segmentLabel() rounds the same value that determines the segment's own
+// width, so a segment near the 9% threshold can only ever show a
+// percentage near 9 -- a four-character value ("100%") requires the
+// segment to itself be ~100% wide, nowhere near this boundary.
+const INLINE_LABEL_THRESHOLD = 9;
 
 interface Segment {
   key: 'high' | 'medium' | 'low';
@@ -72,7 +93,7 @@ export function CompositionBar({ label, composition }: { label: string; composit
         style={{
           display: 'flex',
           width: '100%',
-          height: 20,
+          height: 'var(--comparison-bar-height)',
           borderRadius: 2,
           overflow: 'hidden',
           marginTop: label ? 'var(--space-1)' : 0,
@@ -95,7 +116,7 @@ export function CompositionBar({ label, composition }: { label: string; composit
               {s.pct >= INLINE_LABEL_THRESHOLD && (
                 <span
                   style={{
-                    font: 'var(--weight-semibold) var(--type-legend) / var(--leading-tight) var(--font-family)',
+                    font: 'var(--weight-semibold) var(--type-composition-label) / var(--leading-tight) var(--font-family)',
                     color: s.ink,
                     whiteSpace: 'nowrap',
                   }}
@@ -116,8 +137,20 @@ export function CompositionBar({ label, composition }: { label: string; composit
           {overflow.map((s) => (
             <span
               key={s.key}
-              style={{ font: 'var(--weight-regular) var(--type-legend) / var(--leading-tight) var(--font-family)', color: 'var(--ink-tertiary)' }}
+              style={{ font: 'var(--weight-regular) var(--type-composition-label) / var(--leading-tight) var(--font-family)', color: 'var(--ink-secondary)' }}
             >
+              {/* --ink-secondary, not --ink-tertiary. The Design System
+                  owner asked for the Engineer's read here rather than
+                  guess from a screenshot ("I'll take your read over my
+                  guess") -- this is that read, not yet their own
+                  confirmation: these are the same data values as the
+                  inline labels, just narrow enough to need the stacked
+                  treatment, so they should read as data
+                  (--ink-secondary) rather than caption chrome. Weight is
+                  unchanged (--weight-regular) alongside the size bump,
+                  so this isn't stacking two emphasis changes at once.
+                  Flagged back for their actual confirmation once
+                  deployed. */}
               {s.key[0]!.toUpperCase() + s.key.slice(1)} {segmentLabel(s.pct)}
             </span>
           ))}

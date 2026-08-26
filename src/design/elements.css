@@ -304,3 +304,26 @@
 .records-reveal {
   animation: records-reveal var(--motion-reveal);
 }
+
+/* TAD §I.1 — "Focus rings are --focus-ring at --focus-ring-offset on
+   every interactive element." Only two elements had this
+   (.element-tile[data-status='live'], .horizon-value) before this rule;
+   every plain <button>, <select> and role="button"/"radio" custom
+   control elsewhere in the build (About trigger, both modal/panel Close
+   buttons, the rating filter, pagination, the Comparison bars) was
+   falling back to the browser's own default outline — not token-driven,
+   inconsistent across browsers, and not what the TAD specifies. One
+   generic rule closes the gap for all of them at once rather than
+   threading a class onto each. Harmlessly redundant with the two
+   existing specific rules above; not removing those since they're
+   correct as written.
+   AboutModal's dialog container explicitly sets outline: none — that's
+   the container receiving programmatic initial focus on open, not a
+   user-facing interactive control, so it's intentionally excluded here. */
+button:focus-visible,
+select:focus-visible,
+[role='radio']:focus-visible,
+[role='button']:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}

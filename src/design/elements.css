@@ -232,6 +232,9 @@
 .horizon-value {
   display: flex;
   align-items: center;
+  justify-content: flex-start; /* explicit, not relying on the flex default — button UA stylesheets sometimes apply text-align: center */
+  text-align: left;
+  width: 100%; /* stretches to the grid column's max-content width, so all three share one left edge regardless of label length */
   gap: var(--horizon-rule-gap);
   background: transparent;
   border: none;

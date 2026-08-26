@@ -10,7 +10,13 @@ export function MethodologyLabel({ alignment }: { alignment: RegulatoryAlignment
   if (!alignment) return null;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      {/* No explicit gap: both lines are --type-legend/--type-caption
+          (16px each, i.e. the same size), so the separation between them
+          is each line's own --leading-tight line-height, not a flex gap
+          layered on top (Design System owner ruling, 26 Aug 2026 —
+          "the space between lines of a text block is leading, not a
+          flex gap"; try leading before reaching for --space-1). */}
       <span style={{ font: 'var(--weight-semibold) var(--type-legend) / var(--leading-tight) var(--font-family)', color: 'var(--ink-secondary)' }}>
         {alignment.document}
       </span>

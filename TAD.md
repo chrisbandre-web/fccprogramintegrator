@@ -1310,6 +1310,7 @@ The About modal with the approved text pasted verbatim · the focus-order pass e
 | Recharts in the frozen Form | §F.23 | **Closed 21 Aug 2026** — fifth supersession recorded in DD v0.9.3 |
 | Tile character budgets (60 / 60) | §D.1.1 | Provisional; confirmed by `OverflowSentinel` at the phase 1 exit |
 | **TAD-to-DD fidelity** | — | **Checked and clean, 21 Aug 2026.** A fresh-context Reviewer with DD v0.9.2 and the Marketing Pack assessed v0.3 against the twenty-two flag resolutions, the interaction matrix, the two number sets, the check labelling and the seed-contract designations, and returned no findings. Not re-run against v0.9.4, whose changes are confined to the legend strings and are carried here |
+| **TAD-5's blind spot** | §L.3 item 6 | **Open, flagged 26 Aug 2026 (Design System owner).** `npm run check`'s raw-`px` scan walks `.css` files only. This build styles almost everything through inline JSX style objects, not CSS classes — a hand-typed value there (e.g. `height: 20`) compiles to `20px` but the source text never contains the substring `"px"`, so it passes 21/21 regardless of token conformance. The check's own green result is accurate for `.css` and silent — not clean — for everything styled inline. Widening the scan to `.tsx`/`.ts` is recommended as a separate pass, expected to surface more pre-existing values once run; not held against phase 6's exit. |
 
 ### L.2 Component count summary
 
@@ -1334,7 +1335,7 @@ Every mechanically checkable claim, in one script, each printing a pass/fail lin
 3. No file under `src/engine/` imports React or anything from `src/shell/`, `src/modules/` or `src/design/`.
 4. No file under `src/shell/` contains any element id, element title or group name from the registry.
 5. No colour literal (`#`, `rgb(`, `hsl(`) outside `src/design/tokens.css`.
-6. No raw `px` value outside `tokens.css`, `canvas.css` and `elements.css`.
+6. No raw `px` value outside `tokens.css`. *(Scans `.css` files only — see §L.1, "TAD-5's blind spot.")*
 7. `--ink-secondary` appears in no file under `src/shell/`.
 8. `--status-red|amber|green` appears only in `HealthMark.tsx` and `tokens.css`.
 9. `src/generated/` files carry the *generated — do not edit* header and are byte-identical to a fresh generation.

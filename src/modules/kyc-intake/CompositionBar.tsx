@@ -107,7 +107,12 @@ export function CompositionBar({ label, composition }: { label: string; composit
           ))}
       </div>
       {overflow.length > 0 && (
-        <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 2 }}>
+        <div style={{ display: 'flex', gap: 'var(--space-2)', marginTop: 'var(--space-1)' }}>
+          {/* --space-1, not a raw 2 — Design System owner ruling, 26 Aug
+              2026: 2 canvas is 1.5 rendered, which rounds unpredictably
+              across browsers' subpixel handling; --space-1 (4 canvas / 3
+              rendered) is deterministic and still tight enough to read
+              as grouped with the bar above it. */}
           {overflow.map((s) => (
             <span
               key={s.key}

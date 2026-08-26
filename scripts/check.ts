@@ -437,12 +437,15 @@ function addDaysCheck(d: string, n: number): string {
 }
 
 // --- TAD-23 (§L.4.5, §D.5.16) — the register's exact enumerated       --
-// arrangement, including the single-element exception. Reserved as an   --
-// open slot when TAD-21/22 were added (v1.5's own numbering collided    --
-// with the pre-existing TAD-20); built now, 26 Aug 2026, alongside the  --
-// fix -- RegisterField.tsx never actually implemented the exception,    --
-// only the strict break, despite it being Coordinator-approved since    --
-// 23 August. This is what stops that regressing silently again.        --
+// arrangement. Originally built 26 Aug 2026 to guard a single-element   --
+// merge exception at the Data/Governance boundary (then Coordinator-    --
+// approved since 23 August). REVERTED the same day: a second Coordinator--
+// ruling preferred the plain orphan (Recordkeeping alone) over having   --
+// Risk Appetite Statement sit apart from Board/Risk Committee Reporting.--
+// This check now reproduces the plain strict-break algorithm (no        --
+// exception) and asserts the resulting table, so a regression toward    --
+// the withdrawn exception fails the run just as reliably as the         --
+// original check guarded the exception itself.                         --
 const EXPECTED_REGISTER_ARRANGEMENT: readonly (readonly string[])[] = [
   ['ewra', 'emerging-risk'],
   ['kyc', 'edd', 'tm'],
@@ -452,8 +455,8 @@ const EXPECTED_REGISTER_ARRANGEMENT: readonly (readonly string[])[] = [
   ['training', 'qa', 'exam-audit-mgmt'],
   ['issue-mgmt', 'change-mgmt'],
   ['data-management', 'models-non-model-tools', 'information-sharing'],
-  ['recordkeeping', 'risk-appetite-statement'],
-  ['board-reporting', 'risk-committee-reporting'],
+  ['recordkeeping'],
+  ['risk-appetite-statement', 'board-reporting', 'risk-committee-reporting'],
 ];
 
 function checkRegisterArrangement(): void {
@@ -464,28 +467,22 @@ function checkRegisterArrangement(): void {
     };
     const register = doc.declarations.filter((d) => d.placement.band === 'program-elements');
 
-    // Reproduce packIntoRows' algorithm exactly (RegisterField.tsx), over
-    // the generated data rather than importing the .tsx component.
-    const clusters: { group: string | null; items: string[] }[] = [];
-    for (const d of register) {
-      const last = clusters[clusters.length - 1];
-      if (!last || last.group !== d.placement.group) clusters.push({ group: d.placement.group, items: [d.id] });
-      else last.items.push(d.id);
-    }
+    // Reproduce packIntoRows' algorithm exactly (RegisterField.tsx, the
+    // plain strict break — no single-element exception), over the
+    // generated data rather than importing the .tsx component.
     const rows: string[][] = [];
-    let pending: string[] = [];
-    clusters.forEach((cluster, i) => {
-      const remaining = [...cluster.items];
-      if (pending.length > 0) {
-        rows.push([...pending, ...remaining.splice(0, 1)]);
-        pending = [];
+    let previousGroup: string | null | undefined = undefined;
+    for (const d of register) {
+      const currentRow = rows[rows.length - 1];
+      const groupChanged = d.placement.group !== previousGroup;
+      const rowIsFull = currentRow && currentRow.length >= 3;
+      if (!currentRow || groupChanged || rowIsFull) {
+        rows.push([d.id]);
+      } else {
+        currentRow.push(d.id);
       }
-      while (remaining.length > 3) rows.push(remaining.splice(0, 3));
-      const isLast = i === clusters.length - 1;
-      if (remaining.length === 1 && !isLast) pending = remaining;
-      else if (remaining.length > 0) rows.push(remaining);
-    });
-    if (pending.length > 0) rows.push(pending);
+      previousGroup = d.placement.group;
+    }
 
     const matches =
       rows.length === EXPECTED_REGISTER_ARRANGEMENT.length &&
@@ -493,7 +490,7 @@ function checkRegisterArrangement(): void {
 
     record(
       'TAD-23',
-      "The register's exact enumerated arrangement (§L.4.5), including the single-element exception at the Data/Governance boundary",
+      "The register's exact enumerated arrangement (§L.4.5), plain strict break, no single-element exception",
       matches,
       matches ? '' : `got ${JSON.stringify(rows)}`,
     );

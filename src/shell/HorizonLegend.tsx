@@ -18,12 +18,14 @@ import { useActiveContext, useContextHorizon } from './SessionStateProvider.tsx'
 // --type-horizon-value's literal size for both lines (not the token
 // itself) per the general "closer to Month/Quarter/Year" instruction.
 //
-// Revised same day: "Time Period — {qualifier}" was one line that wrapped
-// wherever the browser happened to break it (observed: "Time Period — As"
-// / "at", splitting the qualifier phrase itself mid-word). Split into two
-// deliberate lines -- "Time Period" (the header), then "— {qualifier}"
-// (its subheader) -- so the break point is a design decision, not
-// whatever the frame's fixed width happens to force.
+// Revised twice more the same day. First: "Time Period — {qualifier}"
+// wrapped wherever the frame's fixed width happened to break it
+// ("Time Period — As" / "at"), so it was split into two deliberate
+// lines. Second, seen against the actual render: three lines
+// ("Time Period" / "— {qualifier}" / "{value}") read as one too many --
+// "Time Period:" (colon, not an em dash) is now the header alone, and
+// "{qualifier} {value}" ("As at Today") is one combined subheader line,
+// sized down from 24 to fit as a single row rather than wrapping.
 export function HorizonLegend(): JSX.Element {
   const [activeContext] = useActiveContext();
   const [horizon] = useContextHorizon();
@@ -40,26 +42,26 @@ export function HorizonLegend(): JSX.Element {
         style={{
           font: 'var(--weight-regular) 24px / var(--leading-tight) var(--font-family)',
           color: 'var(--ink-tertiary)',
-        }}
-      >
-        Time Period
-      </div>
-      <div
-        style={{
-          font: 'var(--weight-regular) 24px / var(--leading-tight) var(--font-family)',
-          color: 'var(--ink-tertiary)',
           marginBottom: 'var(--space-1)',
         }}
       >
-        — {horizonQualifier}
+        Time Period:
       </div>
       <div
         style={{
-          font: 'var(--weight-regular) 24px / var(--leading-tight) var(--font-family)',
-          color: 'var(--ink-secondary)',
+          // PROVISIONAL, not yet a token -- 16 canvas (back to the
+          // original pre-redesign floor), not 18. The Board's qualifier
+          // + value combination ("As at Today," 11 characters) is the
+          // short case; the module's is nearly double ("Trailing T - 365
+          // Days," 22 characters) and was not the case shown when this
+          // was last checked. 16 is the safer bet for both, but this
+          // still needs an actual look at the module's Quarter/Year
+          // view specifically -- the long case, not the one screenshot.
+          font: 'var(--weight-regular) 16px / var(--leading-tight) var(--font-family)',
+          color: 'var(--ink-tertiary)',
         }}
       >
-        {horizonLegend[horizon]}
+        {horizonQualifier} {horizonLegend[horizon]}
       </div>
     </div>
   );

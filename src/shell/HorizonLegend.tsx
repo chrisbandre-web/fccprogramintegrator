@@ -17,6 +17,13 @@ import { useActiveContext, useContextHorizon } from './SessionStateProvider.tsx'
 // pair rather than continuous wrapped text. Sizes PROVISIONAL, reused at
 // --type-horizon-value's literal size for both lines (not the token
 // itself) per the general "closer to Month/Quarter/Year" instruction.
+//
+// Revised same day: "Time Period — {qualifier}" was one line that wrapped
+// wherever the browser happened to break it (observed: "Time Period — As"
+// / "at", splitting the qualifier phrase itself mid-word). Split into two
+// deliberate lines -- "Time Period" (the header), then "— {qualifier}"
+// (its subheader) -- so the break point is a design decision, not
+// whatever the frame's fixed width happens to force.
 export function HorizonLegend(): JSX.Element {
   const [activeContext] = useActiveContext();
   const [horizon] = useContextHorizon();
@@ -33,10 +40,18 @@ export function HorizonLegend(): JSX.Element {
         style={{
           font: 'var(--weight-regular) 24px / var(--leading-tight) var(--font-family)',
           color: 'var(--ink-tertiary)',
+        }}
+      >
+        Time Period
+      </div>
+      <div
+        style={{
+          font: 'var(--weight-regular) 24px / var(--leading-tight) var(--font-family)',
+          color: 'var(--ink-tertiary)',
           marginBottom: 'var(--space-1)',
         }}
       >
-        Time Period — {horizonQualifier}
+        — {horizonQualifier}
       </div>
       <div
         style={{

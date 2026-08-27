@@ -27,9 +27,10 @@ export function NavigationFrame(): JSX.Element {
       <HorizonLegend />
       <MarkLegend />
       {/* marginTop: auto pushes About toward the bottom of the panel,
-          filling the space that used to sit empty below MarkLegend --
-          Coordinator direction, 27 Aug 2026. */}
-      <div style={{ marginTop: 'auto' }}>
+          filling the space that used to sit empty below MarkLegend;
+          justifyContent: center centers it horizontally within the panel
+          -- both per Coordinator direction, 27 Aug 2026. */}
+      <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'center' }}>
         <AboutAffordance />
       </div>
     </div>

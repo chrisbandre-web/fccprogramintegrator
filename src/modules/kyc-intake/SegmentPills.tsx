@@ -2,41 +2,56 @@ import type { Composition } from './selectors.ts';
 import type { KycAction, KycState } from './moduleState.ts';
 import type { BusinessLine, Rating } from '../../data/types.ts';
 
-// TAD §D.6.12 (revised 27 Aug 2026, Design System owner ruling, v1.4) —
-// "a neutral control carrying a bounded colour mark, not a tinted
-// field." Replaces the first cut of this component, which filled every
-// pill with its own --risk-bar-* at full strength regardless of
-// selection state — visually competed with the bar and, when a tint was
-// tried instead to quiet it, broke down entirely for Low (source
-// saturation 0.09; there's nothing left to dilute, and its hue angle
-// goes numerically meaningless well before any useful tint ratio).
+// TAD §D.6.12 (v1.4, Design System owner ruling, 27 Aug 2026) — Rule B
+// applied to a control: the pill surface stays neutral and colour is a
+// bounded mark, exactly as the board's 26 elements already work.
 //
-// This is Rule B from Touch One, unchanged, applied here rather than
-// invented new: RAG is a mark, not a field. Every one of the 26 board
-// elements already teaches the viewer this pattern before they reach
-// the Comparison.
+// Selection has TWO SEPARATE signals, not one shared between them:
 //
-//   Unselected: --surface fill, 1px --surface-edge keyline,
-//     --ink-primary text, a small square swatch in the leading position
-//     at the segment's own --risk-bar-* value, full strength.
-//   Selected: fills with its own --risk-bar-* at full strength,
-//     semibold weight, a leading rule -- three signals, so selection is
-//     never colour alone. Selected-state ink reuses Touch Two Amendment
-//     1's segment-label rule verbatim (--surface on high, --ink-primary
-//     on medium/low) rather than inventing a second rule for the same
-//     colours.
+//   RATING selection (this component): fill vs. outline. A solid pill
+//   against outlined pills is a FORM difference, not a colour one — it
+//   survives full desaturation (verified in greyscale, 27 Aug 2026), so
+//   it's already non-colour and already greyscale-safe on its own.
+//   REGULAR weight throughout. Do NOT reinstate bold as an accessibility
+//   measure here — it never was one. Fill alone is what's carrying the
+//   signal; bold was redundant with it, not reinforcing it. A future
+//   reviewer seeing white-on-oxblood at regular weight may read "colour
+//   selection with no redundancy" and want to add bold back — that
+//   reasoning doesn't hold. Text ink on a selected pill is Touch Two
+//   Amendment 1 §3's segment-label rule, reused verbatim: --surface on
+//   High (7.84:1 — the same ratio as --risk-text-high on --surface,
+//   since it's the same pair of colours with foreground and background
+//   swapped), --ink-primary on Medium and Low.
 //
-// The Low swatch sits at 1.74:1 against --surface -- below the
-// graphical floor, and accepted as such: it's the same value already
-// specified for the MarkLegend swatches (Touch Two Amendment 2), and
-// Rule E is satisfied by the word "Low" beside it, not by the swatch's
-// own contrast. The swatch reinforces; the label carries.
+//   LINE selection: the leading rule on the whole row, in Comparison.tsx
+//   (§D.6.5) — NOT owned by this component, and NOT affected by which
+//   rating is currently selected within a line. An earlier version of
+//   this component duplicated a leading-rule effect per pill, which was
+//   wrong on two counts: it conflated a line-level signal with a
+//   rating-level one, and it duplicated a marker Comparison.tsx already
+//   drew correctly one level up.
+//
+// The unselected line-name pill ("All") gets the same fill-vs-outline
+// treatment when selected, for consistency with the rating pills' rule
+// — a neutral fill (--ink-primary) rather than a --risk-bar-* one, since
+// "All" has no associated risk colour. Not something the Design System
+// owner's ruling addressed directly (their note is about the rating
+// pills specifically); this is the Engineer's direct extension of the
+// same stated principle to the one pill type it didn't cover, not a
+// separate decision.
+//
+// The tinted-field approach (each pill filled with a lightened mix of
+// its own --risk-bar-* value) was tried and rejected before this —
+// --risk-bar-low's source saturation (0.09) leaves nothing to dilute,
+// and its hue angle goes numerically meaningless well before any usable
+// tint ratio. No single ratio held for all three. See TAD.md §L.1 for
+// the numbers.
 const RATING_FILL: Record<Rating, string> = {
   High: 'var(--risk-bar-high)',
   Medium: 'var(--risk-bar-medium)',
   Low: 'var(--risk-bar-low)',
 };
-// Selected-state ink only -- Touch Two Amendment 1 §3's rule, reused
+// Selected-state ink only — Touch Two Amendment 1 §3's rule, reused
 // verbatim rather than re-specified.
 const SELECTED_INK: Record<Rating, string> = {
   High: 'var(--surface)',
@@ -44,15 +59,6 @@ const SELECTED_INK: Record<Rating, string> = {
   Low: 'var(--ink-primary)',
 };
 const RATINGS: readonly Rating[] = ['High', 'Medium', 'Low'];
-
-// PROVISIONAL, not yet a token -- the Design System owner asked to
-// confirm this against the rendered build rather than issue it from
-// arithmetic ("I'd rather confirm the swatch size against the rendered
-// thing than assert 12px from arithmetic"). Carried at 12 canvas here,
-// same convention as --register-title-width's own provisional period
-// (§L.1, §F.10) -- requested as a Touch Two v1.4 addition once a
-// magnified screenshot confirms it.
-const SWATCH_SIZE = 12;
 
 function pct(n: number): string {
   return `${Math.round(n)}%`;
@@ -64,14 +70,25 @@ function Swatch({ fill }: { fill: string }): JSX.Element {
       aria-hidden="true"
       style={{
         display: 'inline-block',
-        width: SWATCH_SIZE,
-        height: SWATCH_SIZE,
+        width: 'var(--pill-swatch-size)',
+        height: 'var(--pill-swatch-size)',
         background: fill,
         flexShrink: 0,
       }}
     />
   );
 }
+
+const PILL_BASE = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 'var(--space-2)',
+  font: 'var(--weight-regular) var(--type-composition-label) / var(--leading-tight) var(--font-family)',
+  borderRadius: 4,
+  padding: '2px 10px',
+  cursor: 'pointer',
+  whiteSpace: 'nowrap',
+} as const;
 
 export function SegmentPills({
   groupLabel,
@@ -107,18 +124,10 @@ export function SegmentPills({
             aria-checked={selected}
             onClick={() => select('All')}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--space-2)',
-              font: `var(${selected ? '--weight-semibold' : '--weight-regular'}) var(--type-composition-label) / var(--leading-tight) var(--font-family)`,
-              color: 'var(--ink-primary)',
-              background: 'var(--surface)',
-              border: '1px solid var(--surface-edge)',
-              borderLeft: selected ? '3px solid var(--ink-primary)' : '1px solid var(--surface-edge)',
-              borderRadius: 4,
-              padding: '2px 10px',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
+              ...PILL_BASE,
+              color: selected ? 'var(--surface)' : 'var(--ink-primary)',
+              background: selected ? 'var(--ink-primary)' : 'var(--surface)',
+              border: selected ? '1px solid transparent' : 'var(--pill-keyline) solid var(--surface-edge)',
             }}
           >
             {groupLabel}
@@ -136,21 +145,17 @@ export function SegmentPills({
             aria-checked={selected}
             onClick={() => select(rating)}
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 'var(--space-2)',
-              font: `var(${selected ? '--weight-semibold' : '--weight-regular'}) var(--type-composition-label) / var(--leading-tight) var(--font-family)`,
+              ...PILL_BASE,
               color: selected ? SELECTED_INK[rating] : 'var(--ink-primary)',
               background: selected ? RATING_FILL[rating] : 'var(--surface)',
-              border: selected ? '1px solid transparent' : '1px solid var(--surface-edge)',
-              borderLeft: selected ? '3px solid var(--ink-primary)' : '1px solid var(--surface-edge)',
-              borderRadius: 4,
-              padding: '2px 10px',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
+              border: selected ? '1px solid transparent' : 'var(--pill-keyline) solid var(--surface-edge)',
             }}
           >
-            <Swatch fill={RATING_FILL[rating]} />
+            {/* Swatch omitted when selected — "the fill states it"
+                (Design System owner, v1.4). Shown unconditionally
+                otherwise, full-strength --risk-bar-*, regardless of how
+                narrow the segment it represents is. */}
+            {!selected && <Swatch fill={RATING_FILL[rating]} />}
             {rating} {pct(value)}
           </button>
         );

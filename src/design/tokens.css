@@ -1,6 +1,6 @@
 /* =============================================================================
    FCC Program Integrator — Design System tokens
-   Touch Two · v1.3 · amended 26 August 2026 · Art Director / Design System owner
+   Touch Two · v1.4 · amended 27 August 2026 · Art Director / Design System owner
 
    THE ONE TOKEN FILE. Every value the build uses lives here. No component
    hardcodes a value this file defines. Role names are the vocabulary the
@@ -215,6 +215,32 @@
                                      only 2.6 rendered px of clearance and the
                                      label reads as jammed in. 24 gives 4.1.
                                      If the label size changes, re-check this.  */
+  --pill-swatch-size:      12px;  /* v1.4 — the SegmentPill's colour swatch.
+                                     Confirmed at rendered size, incl. greyscale. */
+  --pill-keyline:           1px;  /* v1.4 — unselected pill border, --surface-edge */
+
+  /* v1.4 — SEGMENT PILLS. Rule B applied to a control: the pill surface stays
+     neutral and colour is a bounded mark, exactly as the board's 26 elements
+     work. No new colour token: the swatch uses --risk-bar-* at FULL strength.
+     Tinting these values was tested and rejected — --risk-bar-low is already at
+     saturation 0.09, so diluting it yields an arbitrary hue (200 deg -> 90 deg
+     -> 150 deg at 18-28% mixes), which means no tint scheme can cover all three.
+
+       Unselected : --surface fill · --pill-keyline in --surface-edge ·
+                    --ink-primary label · swatch in its --risk-bar-* value
+       Selected   : filled with its own --risk-bar-* at full strength ·
+                    swatch omitted (the fill states it) · REGULAR weight ·
+                    text per the Amendment 1 rule — --surface on high,
+                    --ink-primary on medium and low
+
+     Rule E is satisfied by FORM, not weight: a solid pill against outlined pills
+     survives full desaturation. Verified in greyscale 27 Aug 2026. Bold is
+     therefore NOT required and was deliberately removed; do not reinstate it as
+     an accessibility measure, because it never was one.
+
+     The row's LEADING RULE is a separate signal marking the selected business
+     line, not the selected rating. It persists across rating changes. */
+
   /* The inline/stacked label threshold (~9% of bar width) lives in component
      code, not here: it is derived from label width against bar width, and is
      confirmed visually at magnification rather than computed. */

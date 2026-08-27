@@ -10,6 +10,7 @@ import { defaultSchema } from '../../declarations/schema.ts';
 import { asAtHighShare } from './selectors.ts';
 import { customerIntakeAlignment } from './alignment.ts';
 import { CustomerIntakeModule } from './CustomerIntakeModule.tsx';
+import { MODULE_ID } from './moduleId.ts';
 
 const source = loadLiveElementSource('customers');
 
@@ -75,7 +76,7 @@ function buildElementContent(horizon: ComputeContext['horizon']): ElementContent
 }
 
 export const customerIntakeModule: ModuleDeclaration = {
-  id: 'customers',
+  id: MODULE_ID,
   status: 'live',
   placement: { band: 'business-risk', group: null, order: 0 },
   content: {

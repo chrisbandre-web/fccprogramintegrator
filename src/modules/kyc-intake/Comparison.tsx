@@ -7,6 +7,7 @@ import { bookComposition, intakeComposition, type Composition } from './selector
 import type { KycAction, KycState } from './moduleState.ts';
 import type { RegulatoryAlignment } from '../../declarations/types.ts';
 import type { BusinessLine } from '../../data/types.ts';
+import { MODULE_ID } from './moduleId.ts';
 
 const LINES: readonly { id: BusinessLine; label: string }[] = [
   { id: 'retail-consumer', label: 'Retail' },
@@ -116,7 +117,7 @@ export function Comparison({
   alignment: RegulatoryAlignment | undefined;
 }): JSX.Element {
   const data = useDataAccess();
-  const [horizon] = useContextHorizon('kyc-intake');
+  const [horizon] = useContextHorizon(MODULE_ID);
 
   const collapsed = state.selectedLine !== null;
 

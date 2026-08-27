@@ -4,17 +4,26 @@ import { Comparison } from './Comparison.tsx';
 import { RecordsPanel } from './RecordsPanel.tsx';
 import { initialKycState, kycReducer, type KycAction, type KycState } from './moduleState.ts';
 import { customerIntakeAlignment } from './alignment.ts';
+import { MODULE_ID } from './moduleId.ts';
 
 // TAD §D.6.2 — the module's surface root. Owns its state through
-// useModuleSession('kyc-intake', initialState) so it survives leaving and
-// re-entering, and its horizon through useContextHorizon('kyc-intake'),
+// useModuleSession(MODULE_ID, initialState) so it survives leaving and
+// re-entering, and its horizon through useContextHorizon(MODULE_ID),
 // which initialises to Month on first entry regardless of the Board's
 // value (DD §2) — already true of useContextHorizon's own default, so no
 // extra logic is needed for that half of §J.4's exit condition.
+//
+// MODULE_ID, not a literal here or anywhere else in this module (fixed
+// 27 Aug 2026) — see moduleId.ts. The literal 'kyc-intake' this file,
+// Comparison.tsx and RecordsPanel.tsx all used to hardcode never matched
+// declaration.ts's actual registered id ('customers'), which is what
+// activeContext -- and therefore TimeHorizonControl, which keys off
+// activeContext with no argument -- actually becomes. The Time Horizon
+// control changed a horizon this module was never reading.
 export function CustomerIntakeModule(): JSX.Element {
-  const [state, setState] = useModuleSession<KycState>('kyc-intake', initialKycState);
+  const [state, setState] = useModuleSession<KycState>(MODULE_ID, initialKycState);
   const dispatch = (action: KycAction) => setState(kycReducer(state, action));
-  const [horizon] = useContextHorizon('kyc-intake');
+  const [horizon] = useContextHorizon(MODULE_ID);
 
   // TAD §D.6.3's Implementation Note: page resets on a line change, a
   // filter change (both handled inside the reducer) or a horizon change

@@ -6,6 +6,7 @@ import { RatingFilter } from './RatingFilter.tsx';
 import { Pagination } from './Pagination.tsx';
 import { populationCount, recordPage } from './selectors.ts';
 import type { KycAction, KycState } from './moduleState.ts';
+import { MODULE_ID } from './moduleId.ts';
 
 const LINE_LABELS: Record<'book' | BusinessLine, string> = {
   book: 'the whole book',
@@ -33,7 +34,7 @@ export function RecordsPanel({
   selectedLine: 'book' | BusinessLine;
 }): JSX.Element {
   const data = useDataAccess();
-  const [horizon] = useContextHorizon('kyc-intake');
+  const [horizon] = useContextHorizon(MODULE_ID);
 
   const total = populationCount(data, selectedLine, horizon);
   const page = recordPage(data, selectedLine, state.rating, horizon, state.page);

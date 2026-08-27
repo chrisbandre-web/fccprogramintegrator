@@ -374,6 +374,7 @@ That guarantees the board never scrolls. It does **not** guarantee content fits 
 | D.6.9 | `RecordTable` | module | Eleven columns |
 | D.6.10 | `RatingFilter` | module | All / Low / Medium / High |
 | D.6.11 | `Pagination` | module | 25 per page, present only when needed |
+| D.6.12 | `SegmentPills` | module | The click target and the label, since 27 Aug 2026 |
 | D.7.1 | `lib/format.ts` | shared | Every number-to-string in the build |
 | D.7.2 | `design/*.css` | shared | Tokens, canvas, element treatment |
 
@@ -968,7 +969,7 @@ interface KycState {
 }
 ```
 - **Props / configuration:** none. **Lifecycle:** stored opaquely by `SessionStateProvider`.
-- **Inputs / outputs:** actions — `selectLine`, `deselect`, `setRating`, `setPage`.
+- **Inputs / outputs:** actions — `selectSegment`, `deselect`, `setRating`, `setPage` *(`selectLine` retired 27 Aug 2026, replaced by `selectSegment` — see §D.6.5)*.
 
 **Three invariants the reducer guarantees (⚠️ A19).** The Records panel is visible **iff** `selectedLine !== null`; the Comparison is full-height **iff** `selectedLine === null`. Selection, panel visibility and Comparison height are therefore **one piece of state with two derivations**, not three that can drift. `selectLine` on the already-selected line is `deselect` — closing the panel, deselecting and re-expanding are one action, identical to the close control (DD §3). And `page` resets to 1 whenever the result set's identity changes — a line change, a filter change or a horizon change.
 
@@ -988,18 +989,38 @@ interface KycState {
 
 #### D.6.5 `Comparison` *(closes ⚠️ A18, part)*
 - **Identity / path:** `src/modules/kyc-intake/Comparison.tsx`.
-- **Dependencies:** `CompositionBar`, `selectors.ts`, `MethodologyLabel`.
+- **Dependencies:** `CompositionBar`, `SegmentPills`, `selectors.ts`, `MethodologyLabel`.
 - **Placement:** the module's upper region.
-- **Responsibility:** render **eight bars in four pairs** at full height, or **four bars** collapsed, and take a line selection.
-- **Props / configuration:** `{ state, dispatch }`.
+- **Responsibility:** render **eight bars in four pairs** at full height, or **four bars** collapsed, and lay out `SegmentPills` above whichever bars are interactive.
+- **Props / configuration:** `{ state, dispatch, alignment }`.
 - **State owned:** none.
 - **Lifecycle:** the collapse uses `--motion-collapse`; under `prefers-reduced-motion` it is an instant reflow, so **the selected-line state must be readable from the static layout alone** — weight, a left rule and a position marker, per Design System spec §8.3.
-- **Inputs / outputs:** in — derived compositions. Out — `selectLine`.
+- **Inputs / outputs:** in — derived compositions. Out — `selectSegment`, dispatched by `SegmentPills`, not by this component directly.
 
 > 🔧 **Implementation Note — the collapse changes content, not size.** Collapsed, the per-line *book* bars drop out and the line rows become single-composition bars; the whole-book anchor persists in both states (DD §5). It is a content transition that happens to animate, not a CSS height animation over the same content.
 
+> 🔧 **Revised 27 Aug 2026 (Coordinator ruling) — selection moved from per-LINE to per-SEGMENT.** Originally: one click handler wrapped an entire group (book bar + recent-intake bar together), and clicking anywhere in it selected the line only — `rating` was separate state, changed only via `RatingFilter` inside an already-open Records panel, and persisted independently of which segment (or even which line) you'd clicked to get there. UAT (27 Aug 2026) surfaced this as a real defect against user expectation, not the intended behaviour it happened to match: clicking a bar's High segment could open Records still filtered to whatever rating was last set, sometimes Medium. **`SegmentPills` (§D.6.12) now carries all interaction and all labelling** — the line-name pill selects that line with `rating: 'All'`; each rating pill selects that line with that specific rating. `CompositionBar` (§D.6.6) is now purely a graphic with no click handler and no text.
+>
+> **Whole Book keeps two interactive rows** (its own Book pills and Recent-intake pills); **a business line's Book row is display-only** (composition shown, no pills). This isn't symmetric with Whole Book, and deliberately so: a line's Records query is always `population: 'intake'` at the current horizon regardless of which of its two bars was clicked (`baseQueryFor`, `selectors.ts`) — a second interactive row for a line would be a control that never behaved differently from its neighbour. Whole Book's two rows both dispatch the same `(line: 'book', rating)` action and so both resolve to the same `population: 'book'` query either way — this preserves the pre-existing, already-documented Whole Book asymmetry (below) rather than resolving it; resolving it would require `KycState` to carry which of the two populations was selected, which was explicitly not asked for in this revision.
+
+One asymmetry deliberately left in place, not overlooked: selecting "Whole Book" — from either of its two pill rows — still opens Records against population `'book'` (the true 2,000-record established book, ignoring horizon), not the intake aggregate the Recent-intake bar displays. The three lines don't have this gap — their collapsed bar and their Records population are the same query. `RecordsPanel`'s own header is always live-computed, so what opens is correct on its own terms; it just won't numerically match the bar you clicked to get there. Recorded here rather than silently accepted, since it's the same category of thing the 27 Aug revision was for.
+
 #### D.6.6 `CompositionBar`
-- One 100% stacked composition of High / Medium / Low with **High anchored at the left edge**, so every High segment starts at the same point and is comparable down the column. Props `{ label, composition, selected, onSelect }`. Fills are `--risk-bar-{high|medium|low}`; labels are always present (Rule E). **Built from flex children with percentage widths — there is no chart library** (§F.23).
+One 100% stacked composition of High / Medium / Low with **High anchored at the left edge**, so every High segment starts at the same point and is comparable down the column. Props `{ composition }`. Fills are `--risk-bar-{high|medium|low}`. **Built from flex children with percentage widths — there is no chart library** (§F.23).
+
+> 🔧 **Revised 27 Aug 2026 (Coordinator ruling), alongside §D.6.5.** This component used to own its own click handler (`onSelect`), its own label text drawn inside or below the bar depending on segment width (`INLINE_LABEL_THRESHOLD`), and satisfied Rule E (Touch Two Amendment 1 §3 — a segment must carry its own value) directly. All three moved to `SegmentPills` (§D.6.12). A narrow segment no longer needs special handling here, since nothing is ever rendered inside it — the old crowding/overflow problem this component solved doesn't exist any more, because nothing is fighting for space inside a segment that can be a few rendered pixels wide.
+
+#### D.6.12 `SegmentPills` *(added 27 Aug 2026)*
+- **Identity / path:** `src/modules/kyc-intake/SegmentPills.tsx`.
+- **Dependencies:** `selectors.ts` (`Composition`), `moduleState.ts` (`KycState`, `KycAction`).
+- **Placement:** directly above whichever `CompositionBar` it labels.
+- **Responsibility:** one `role="radiogroup"` of real `<button>`s — a neutral line-name pill (`rating: 'All'`) plus three risk-coloured rating pills (`High`/`Medium`/`Low`), each showing its own percentage. Satisfies Rule E (Touch Two Amendment 1 §3) in `CompositionBar`'s place. Every pill is a fixed-size click target regardless of the percentage it represents — the reason this exists: a 1%-wide bar segment is a few rendered pixels, not a reliable target, and the pill row solves that structurally rather than by widening tiny segments artificially.
+- **Props / configuration:** `{ groupLabel, line, composition, state, dispatch }`.
+- **State owned:** none.
+- **Selected-state treatment:** an `outline` (not a `border`) on the active pill — deliberately outside the pill's own fill, so it reads against the page background regardless of whether the pill under it is light (the line-name pill, the Low rating pill) or dark (the High rating pill); a border-colour approach would need per-pill contrast logic, an outline doesn't.
+- **Inputs / outputs:** in — a `Composition`. Out — `selectSegment`.
+- **Zero-population case:** when `composition.total === 0`, renders "no records" (plain text, `--ink-tertiary`) instead of four pills that would otherwise all show 0% and select nothing meaningfully different from each other.
+
 
 #### D.6.7 `MethodologyLabel` *(the traceability moment — go-live gate)*
 - Renders the module's declared `alignment`: the governing document (*Customer Risk Rating Methodology*) alongside the regulatory expectation it answers to (the FFIEC BSA/AML Examination Manual's Customer Due Diligence section, per CRRM §1). Props: none — it reads the declaration. **This is the one visible instance of regulatory traceability the build ships**, and its presence is a definition-of-done item. It is declared, not hardcoded, so a second module carries its own.
@@ -1021,6 +1042,7 @@ interface KycState {
 
 #### D.6.10 `RatingFilter`
 - All / Low / Medium / High, defaulting to High. Module-owned; persists across line changes, across closing and reopening the panel, and across leaving and re-entering the module. Dispatches `setRating`, which resets `page`.
+- **Unchanged by the 27 Aug 2026 revision, and complementary to it, not replaced by it:** `SegmentPills` (§D.6.12) is a fast path to a specific (line, rating) from the Comparison; `RatingFilter` is how you browse to a *different* rating once Records is already open, without going back to find the right pill. Both dispatch into the same reducer (§D.6.3) and can't disagree.
 
 #### D.6.11 `Pagination`
 - Present **only** when the result exceeds 25, absent otherwise — so the signature view (Commercial / High / Month, 20 ± 3 records) is one clean page with no controls at the moment they would most distract. Renders the position line (*Showing 1–25 of 1,728*) and first/last disabled states. A quiet prompt toward the horizon and rating filters appears when the result runs to many pages.
@@ -1205,7 +1227,7 @@ Board content arrives as generated declarations (§D.1.1). In-product strings li
 
 ## I. Web-Platform Considerations
 
-1. **Accessibility.** Keyboard operability of the core loop with the focus order fixed by DD §4: `Program Element → Time Horizon → About`, then on the Board `Customers tile`, and in the module `business lines left to right → rating filter → close → pagination when present`. Focus rings are `--focus-ring` at `--focus-ring-offset` on every interactive element. **The 24 inactive elements are not focusable, which is itself the honesty signal.** Record rows are not focusable and the table is not a scroll region. The About modal is the only focus trap. All motion respects `prefers-reduced-motion`, which the token file implements by zeroing the three duration tokens — so honouring it requires no component to check anything.
+1. **Accessibility.** Keyboard operability of the core loop with the focus order fixed by DD §4: `Program Element → Time Horizon → About`, then on the Board `Customers tile`, and in the module — revised 27 Aug 2026, see §D.6.5/§D.6.12 — `each group's SegmentPills, top to bottom (Whole Book's Book pills, then Whole Book's Recent-intake pills, then each line's single pill row) → rating filter → close → pagination when present`. Within a pill row, the line-name pill precedes the three rating pills, left to right. A business line's Book bar is display-only and contributes no stop. Focus rings are `--focus-ring` at `--focus-ring-offset` on every interactive element. **The 24 inactive elements are not focusable, which is itself the honesty signal.** Record rows are not focusable and the table is not a scroll region. The About modal is the only focus trap. All motion respects `prefers-reduced-motion`, which the token file implements by zeroing the three duration tokens — so honouring it requires no component to check anything.
 2. **Responsive posture.** None, by decision. One canvas, scaled uniformly (§C.5). No breakpoints, no fluid type ramp, nothing to maintain.
 3. **Performance.** Two runtime dependencies; no chart library; one self-hosted variable font preloaded from the same origin. Scoring ~5,250 records runs synchronously before first paint — measured in milliseconds for arithmetic of this shape, and it is the reason no loading state exists. The fixture ships as JSON in the bundle. **No hard budget is set; the commitment is that the board paints complete on first paint**, which the cold-load check verifies directly.
 4. **Determinism.** The generator is seeded; the fixture is generated once and committed; the snapshot is frozen; every displayed number is a pure function of it. **The demo cannot vary between rehearsal and the room.**
@@ -1321,9 +1343,9 @@ The About modal with the approved text pasted verbatim · the focus-order pass e
 | Data layer | 4 | D.3.1–D.3.4 |
 | Declarations | 5 | D.4.1–D.4.5 |
 | Shell | 24 | D.5.1–D.5.24 |
-| Module | 11 | D.6.1–D.6.11 |
+| Module | 12 | D.6.1–D.6.12 |
 | Shared | 2 | D.7.1–D.7.2 |
-| **Total** | **54** | of which 45 are named build units and 9 are type/data/CSS modules |
+| **Total** | **55** | of which 46 are named build units and 9 are type/data/CSS modules |
 
 ### L.3 Verification hooks — `npm run check`
 

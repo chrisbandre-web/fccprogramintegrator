@@ -1,6 +1,7 @@
 import { useDataAccess } from '../../shell/DataAccessProvider.tsx';
 import { useContextHorizon } from '../../shell/SessionStateProvider.tsx';
 import { CompositionBar } from './CompositionBar.tsx';
+import { SegmentPills } from './SegmentPills.tsx';
 import { MethodologyLabel } from './MethodologyLabel.tsx';
 import { bookComposition, intakeComposition, type Composition } from './selectors.ts';
 import type { KycAction, KycState } from './moduleState.ts';
@@ -13,57 +14,85 @@ const LINES: readonly { id: BusinessLine; label: string }[] = [
   { id: 'asset-management', label: 'Asset Management' },
 ];
 
+// A small plain-text row caption — "Book" / "Recent intake" — distinguishing
+// which population a bar shows. Not the line's identity any more (the
+// SegmentPills line-name pill carries that); just which of the two rows
+// this is, for groups that show both.
+function RowCaption({ children }: { children: string }): JSX.Element {
+  return (
+    <span style={{ font: 'var(--weight-regular) var(--type-legend) / var(--leading-tight) var(--font-family)', color: 'var(--ink-tertiary)' }}>
+      {children}
+    </span>
+  );
+}
+
 /**
- * One selectable group: at full height, a labelled pair (book above,
- * recent intake below); collapsed, a single bar. Wrapping the pair in one
- * clickable container — rather than making each bar independently
- * clickable — is what makes "click either bar in the row" and "the row
- * is one destination" the same fact (TAD §D.6.5: selection is per LINE,
- * not per bar).
+ * One selectable group. TAD §D.6.5 revised 27 Aug 2026 (Coordinator
+ * ruling): selection used to be per LINE, via one click handler wrapping
+ * the whole group. It is now per SEGMENT, via SegmentPills sitting above
+ * whichever bar is interactive — CompositionBar itself carries no click
+ * handler at all any more (§D.6.6). This component now only lays bars
+ * and pill rows out; it owns no interaction directly.
+ *
+ * Whole Book keeps both rows interactive (its own two pill rows, book
+ * and recent intake) per the Coordinator's ruling — both currently
+ * dispatch the same (line: 'book', rating) action and so resolve to the
+ * same population query (§D.6.4's bookComposition is horizon-independent
+ * either way this is reached), preserving the pre-existing, documented
+ * Whole Book asymmetry rather than resolving it. A business line's Book
+ * row is display-only: no pills, no interaction — its Records query was
+ * always population 'intake' at the current horizon regardless of which
+ * of its two bars was clicked (baseQueryFor, selectors.ts), so a second,
+ * always-redundant interactive row would have been a control that never
+ * did anything different from its neighbour.
  */
 function ComparisonGroup({
   groupLabel,
+  line,
   book,
   recent,
   collapsed,
   selected,
-  onSelect,
+  interactiveBook,
+  state,
+  dispatch,
 }: {
   groupLabel: string;
+  line: 'book' | BusinessLine;
   book: Composition | null; // null when collapsed — the book row drops out (§D.6.5's Implementation Note)
   recent: Composition;
   collapsed: boolean;
   selected: boolean;
-  onSelect: () => void;
+  interactiveBook: boolean; // true only for Whole Book — a line's Book row is display-only
+  state: KycState;
+  dispatch: (action: KycAction) => void;
 }): JSX.Element {
   return (
     <div
-      role="button"
-      tabIndex={0}
-      onClick={onSelect}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onSelect();
-        }
-      }}
       style={{
-        cursor: 'pointer',
         borderLeft: selected ? '3px solid var(--ink-primary)' : '3px solid transparent',
         paddingLeft: 'var(--space-2)',
       }}
     >
-      <div style={{ font: `var(${selected ? '--weight-semibold' : '--weight-medium'}) var(--type-legend) / var(--leading-tight) var(--font-family)`, color: 'var(--ink-secondary)', marginBottom: 'var(--space-1)' }}>
-        {selected && <span aria-hidden="true">▸ </span>}
-        {groupLabel}
-      </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-        {book && <CompositionBar label="Book" composition={book} />}
-        {/* Collapsed: one bar, no sub-label — the group heading above
-            already names it (whole book, or the line). Full height: the
-            recent-intake bar is always labelled explicitly, paired with
-            the book bar above it. */}
-        <CompositionBar label={collapsed ? '' : 'Recent intake'} composition={recent} />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+        {book && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+            <RowCaption>Book</RowCaption>
+            {interactiveBook ? (
+              <SegmentPills groupLabel={groupLabel} line={line} composition={book} state={state} dispatch={dispatch} />
+            ) : null}
+            <CompositionBar composition={book} />
+          </div>
+        )}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+          {/* Collapsed: no caption — the pill row's own line-name pill
+              already names it, and there's no second bar left to
+              disambiguate against. Full height: always "Recent intake",
+              paired with "Book" above. */}
+          {!collapsed && <RowCaption>Recent intake</RowCaption>}
+          <SegmentPills groupLabel={groupLabel} line={line} composition={recent} state={state} dispatch={dispatch} />
+          <CompositionBar composition={recent} />
+        </div>
       </div>
     </div>
   );
@@ -74,8 +103,7 @@ function ComparisonGroup({
 // intake below); four bars collapsed (the whole-book GROUP persists as
 // a row — unlike the per-line book bars, which drop out — but its
 // MEASURE does not change: every collapsed bar shows Recent intake, so
-// the four collapsed bars are directly comparable. See the fix note on
-// the Whole Book group below for the defect this corrects.) The collapse
+// the four collapsed bars are directly comparable). The collapse
 // changes what's displayed, not merely its size — a content transition,
 // not a CSS one (§D.6.5's Implementation Note).
 export function Comparison({
@@ -91,7 +119,6 @@ export function Comparison({
   const [horizon] = useContextHorizon('kyc-intake');
 
   const collapsed = state.selectedLine !== null;
-  const selectLine = (line: 'book' | BusinessLine) => dispatch({ type: 'selectLine', line });
 
   const wholeBook = bookComposition(data);
   const wholeRecent = intakeComposition(data, horizon);
@@ -101,46 +128,27 @@ export function Comparison({
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
         <ComparisonGroup
           groupLabel="Whole Book"
+          line="book"
           book={collapsed ? null : wholeBook}
-          // FIX, 26 Aug 2026 (Design System owner review, verified at
-          // magnification): this used to show wholeBook here, on the
-          // premise that "the whole-book anchor persists in both states"
-          // (§D.6.5) meant the anchor's own measure carries over
-          // unchanged. It doesn't — that phrase describes which
-          // STRUCTURAL row survives collapse (the whole-book group,
-          // unlike the per-line book bars, which drop out), not which
-          // MEASURE it displays. The bug: collapsed, Whole Book was
-          // showing its Book composition while Retail/Commercial/AM
-          // showed Recent intake — comparing unlike things with nothing
-          // on screen saying so, which inverts the point of the
-          // comparison (book vs. recent intake diverging). All four
-          // collapsed bars now show the same measure, Recent intake.
-          //
-          // One asymmetry deliberately left in place, not overlooked:
-          // selecting "Whole Book" still opens Records against
-          // population 'book' (the true 2,000-record established book,
-          // ignoring horizon), not the intake aggregate this bar now
-          // displays. The three lines don't have this gap — their
-          // collapsed bar and their Records population are the same
-          // query. RecordsPanel's own header is always live-computed, so
-          // what opens is correct on its own terms; it just won't
-          // numerically match the bar you clicked to get there. Recorded
-          // here rather than silently accepted, since it's the same
-          // category of thing this fix was for.
           recent={wholeRecent}
           collapsed={collapsed}
           selected={state.selectedLine === 'book'}
-          onSelect={() => selectLine('book')}
+          interactiveBook={true}
+          state={state}
+          dispatch={dispatch}
         />
         {LINES.map((line) => (
           <ComparisonGroup
             key={line.id}
             groupLabel={line.label}
+            line={line.id}
             book={collapsed ? null : bookComposition(data, line.id)}
             recent={intakeComposition(data, horizon, line.id)}
             collapsed={collapsed}
             selected={state.selectedLine === line.id}
-            onSelect={() => selectLine(line.id)}
+            interactiveBook={false}
+            state={state}
+            dispatch={dispatch}
           />
         ))}
       </div>

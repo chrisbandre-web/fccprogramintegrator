@@ -2,36 +2,75 @@ import type { Composition } from './selectors.ts';
 import type { KycAction, KycState } from './moduleState.ts';
 import type { BusinessLine, Rating } from '../../data/types.ts';
 
-// TAD §D.6.6 (revised 27 Aug 2026, Coordinator ruling) — the pill row is
-// the ONLY interactive and ONLY label-bearing surface for a composition;
-// CompositionBar itself is a plain graphic, no click handler, no text.
-// This is what makes narrow segments (a 1%-wide sliver is a few rendered
-// pixels — not a reliable click target) as reachable as a 90%-wide one:
-// every pill is a fixed-size, real <button>, regardless of what
-// percentage it represents. Also what satisfies Rule E (Touch Two
-// Amendment 1 §3 — a segment must carry its own value, not just a
-// legend) now that the bar itself carries none: the pill IS the value.
+// TAD §D.6.12 (revised 27 Aug 2026, Design System owner ruling, v1.4) —
+// "a neutral control carrying a bounded colour mark, not a tinted
+// field." Replaces the first cut of this component, which filled every
+// pill with its own --risk-bar-* at full strength regardless of
+// selection state — visually competed with the bar and, when a tint was
+// tried instead to quiet it, broke down entirely for Low (source
+// saturation 0.09; there's nothing left to dilute, and its hue angle
+// goes numerically meaningless well before any useful tint ratio).
 //
-// One line-name pill (rating: 'All', neutral styling) plus three rating
-// pills (risk-coloured, matching CompositionBar's fills exactly so the
-// pill row and the bar it sits above read as the same data). A
-// radiogroup, not four independent buttons — selecting one line's rating
-// is mutually exclusive within that row, same convention as
-// RatingFilter and TimeHorizonControl elsewhere in this module/shell.
+// This is Rule B from Touch One, unchanged, applied here rather than
+// invented new: RAG is a mark, not a field. Every one of the 26 board
+// elements already teaches the viewer this pattern before they reach
+// the Comparison.
+//
+//   Unselected: --surface fill, 1px --surface-edge keyline,
+//     --ink-primary text, a small square swatch in the leading position
+//     at the segment's own --risk-bar-* value, full strength.
+//   Selected: fills with its own --risk-bar-* at full strength,
+//     semibold weight, a leading rule -- three signals, so selection is
+//     never colour alone. Selected-state ink reuses Touch Two Amendment
+//     1's segment-label rule verbatim (--surface on high, --ink-primary
+//     on medium/low) rather than inventing a second rule for the same
+//     colours.
+//
+// The Low swatch sits at 1.74:1 against --surface -- below the
+// graphical floor, and accepted as such: it's the same value already
+// specified for the MarkLegend swatches (Touch Two Amendment 2), and
+// Rule E is satisfied by the word "Low" beside it, not by the swatch's
+// own contrast. The swatch reinforces; the label carries.
 const RATING_FILL: Record<Rating, string> = {
   High: 'var(--risk-bar-high)',
   Medium: 'var(--risk-bar-medium)',
   Low: 'var(--risk-bar-low)',
 };
-const RATING_INK: Record<Rating, string> = {
+// Selected-state ink only -- Touch Two Amendment 1 §3's rule, reused
+// verbatim rather than re-specified.
+const SELECTED_INK: Record<Rating, string> = {
   High: 'var(--surface)',
   Medium: 'var(--ink-primary)',
   Low: 'var(--ink-primary)',
 };
 const RATINGS: readonly Rating[] = ['High', 'Medium', 'Low'];
 
+// PROVISIONAL, not yet a token -- the Design System owner asked to
+// confirm this against the rendered build rather than issue it from
+// arithmetic ("I'd rather confirm the swatch size against the rendered
+// thing than assert 12px from arithmetic"). Carried at 12 canvas here,
+// same convention as --register-title-width's own provisional period
+// (§L.1, §F.10) -- requested as a Touch Two v1.4 addition once a
+// magnified screenshot confirms it.
+const SWATCH_SIZE = 12;
+
 function pct(n: number): string {
   return `${Math.round(n)}%`;
+}
+
+function Swatch({ fill }: { fill: string }): JSX.Element {
+  return (
+    <span
+      aria-hidden="true"
+      style={{
+        display: 'inline-block',
+        width: SWATCH_SIZE,
+        height: SWATCH_SIZE,
+        background: fill,
+        flexShrink: 0,
+      }}
+    />
+  );
 }
 
 export function SegmentPills({
@@ -68,19 +107,14 @@ export function SegmentPills({
             aria-checked={selected}
             onClick={() => select('All')}
             style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
               font: `var(${selected ? '--weight-semibold' : '--weight-regular'}) var(--type-composition-label) / var(--leading-tight) var(--font-family)`,
-              color: selected ? 'var(--ink-primary)' : 'var(--ink-secondary)',
+              color: 'var(--ink-primary)',
               background: 'var(--surface)',
               border: '1px solid var(--surface-edge)',
-              /* Selected-state ring sits OUTSIDE the pill (outline, not
-                 border) deliberately — it renders against the page
-                 background, never the pill's own fill, so the same rule
-                 reads correctly whether the pill under it is light
-                 (this one) or dark (the High rating pill below). A
-                 border-colour approach would need per-pill contrast
-                 logic; this doesn't. */
-              outline: selected ? '2px solid var(--ink-primary)' : 'none',
-              outlineOffset: 'var(--focus-ring-offset)',
+              borderLeft: selected ? '3px solid var(--ink-primary)' : '1px solid var(--surface-edge)',
               borderRadius: 4,
               padding: '2px 10px',
               cursor: 'pointer',
@@ -102,18 +136,21 @@ export function SegmentPills({
             aria-checked={selected}
             onClick={() => select(rating)}
             style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 'var(--space-2)',
               font: `var(${selected ? '--weight-semibold' : '--weight-regular'}) var(--type-composition-label) / var(--leading-tight) var(--font-family)`,
-              color: RATING_INK[rating],
-              background: RATING_FILL[rating],
-              border: 'none',
-              outline: selected ? '2px solid var(--ink-primary)' : 'none',
-              outlineOffset: 'var(--focus-ring-offset)',
+              color: selected ? SELECTED_INK[rating] : 'var(--ink-primary)',
+              background: selected ? RATING_FILL[rating] : 'var(--surface)',
+              border: selected ? '1px solid transparent' : '1px solid var(--surface-edge)',
+              borderLeft: selected ? '3px solid var(--ink-primary)' : '1px solid var(--surface-edge)',
               borderRadius: 4,
               padding: '2px 10px',
               cursor: 'pointer',
               whiteSpace: 'nowrap',
             }}
           >
+            <Swatch fill={RATING_FILL[rating]} />
             {rating} {pct(value)}
           </button>
         );

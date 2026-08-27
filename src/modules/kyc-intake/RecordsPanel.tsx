@@ -81,7 +81,21 @@ export function RecordsPanel({
         </button>
       </div>
 
-      <div style={{ flex: 1, overflow: 'hidden', padding: 'var(--space-4)' }}>
+      {/* TAD §I.1/§D.6.9 say "the table is not a scroll region" in the
+          keyboard/tab-order sense — a scrollable div can silently become
+          an undocumented Tab stop, which the focus-order audit (§I.1)
+          never accounted for. tabIndex={-1} keeps that true: this
+          container is removed from the tab sequence, so it can't be
+          reached or landed on by keyboard navigation. overflow was
+          'hidden', not 'auto' — that's a different thing entirely, and a
+          real bug: UAT (27 Aug 2026, C4) found records genuinely
+          unreachable, clipped below the visible area with no way to see
+          them, even though the header correctly reported a larger count
+          (21 of 40) than what was showing (11 rows). 'hidden' discards
+          the overflow instead of making it reachable; 'auto' (mouse/
+          trackpad-scrollable, keyboard-inert via tabIndex) fixes the
+          real defect without reopening the tab-order question. */}
+      <div style={{ flex: 1, overflow: 'auto', padding: 'var(--space-4)' }} tabIndex={-1}>
         {page.total === 0 ? (
           <p style={{ color: 'var(--ink-tertiary)', font: 'var(--weight-regular) var(--type-body) / var(--leading-body) var(--font-family)' }}>
             No {state.rating === 'All' ? '' : `${state.rating}-rated `}records for {lineLabel} at this horizon.

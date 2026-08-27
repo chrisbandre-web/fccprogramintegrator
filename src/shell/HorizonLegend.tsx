@@ -11,6 +11,12 @@ import { useActiveContext, useContextHorizon } from './SessionStateProvider.tsx'
 // Period — {qualifier}" header line above the value ("As at" on the
 // Board, "Trailing" in a module), and supersedes the construction-time
 // compressed value text ("Today"/"T-90") with the confirmed strings.
+//
+// Coordinator direction, 27 Aug 2026: both lines larger, with a little
+// more separation between them so they read as a clear header-then-value
+// pair rather than continuous wrapped text. Sizes PROVISIONAL, reused at
+// --type-horizon-value's literal size for both lines (not the token
+// itself) per the general "closer to Month/Quarter/Year" instruction.
 export function HorizonLegend(): JSX.Element {
   const [activeContext] = useActiveContext();
   const [horizon] = useContextHorizon();
@@ -25,15 +31,16 @@ export function HorizonLegend(): JSX.Element {
     <div>
       <div
         style={{
-          font: 'var(--weight-regular) var(--type-frame-label) / var(--leading-tight) var(--font-family)',
+          font: 'var(--weight-regular) 24px / var(--leading-tight) var(--font-family)',
           color: 'var(--ink-tertiary)',
+          marginBottom: 'var(--space-1)',
         }}
       >
         Time Period — {horizonQualifier}
       </div>
       <div
         style={{
-          font: 'var(--weight-regular) var(--type-legend) / var(--leading-tight) var(--font-family)',
+          font: 'var(--weight-regular) 24px / var(--leading-tight) var(--font-family)',
           color: 'var(--ink-secondary)',
         }}
       >

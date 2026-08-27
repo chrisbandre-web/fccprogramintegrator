@@ -26,7 +26,12 @@ export function NavigationFrame(): JSX.Element {
       <TimeHorizonControl />
       <HorizonLegend />
       <MarkLegend />
-      <AboutAffordance />
+      {/* marginTop: auto pushes About toward the bottom of the panel,
+          filling the space that used to sit empty below MarkLegend --
+          Coordinator direction, 27 Aug 2026. */}
+      <div style={{ marginTop: 'auto' }}>
+        <AboutAffordance />
+      </div>
     </div>
   );
 }
@@ -50,10 +55,18 @@ export function NavigationFrame(): JSX.Element {
 // asset — no lockup SVG is used; mark and wordmark are composed directly.
 function BrandBlock(): JSX.Element {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--space-2)' }}>
+      {/* PROVISIONAL, not yet a token. Coordinator direction, 27 Aug 2026
+          ("18-22% larger and centered in the middle of the row"): 88 * 1.2
+          = 105.6, carried at 106 canvas -- same convention as
+          --pill-swatch-size's own provisional period before v1.4 (moved
+          from left-aligned to centered per the same note). To be taken to
+          the Design System owner alongside other phase 6 screenshots
+          rather than confirmed up front, per the Coordinator's own
+          instruction this round. */}
       <svg
         viewBox="0 0 200 200"
-        style={{ width: 'var(--brand-mark-size)', height: 'var(--brand-mark-size)' }}
+        style={{ width: 106, height: 106 }}
         role="img"
         aria-label="FCC Program Integrator"
       >
@@ -63,13 +76,36 @@ function BrandBlock(): JSX.Element {
         <path d="M 104.60 165.84 A 66 66 0 0 1 49.44 142.42" fill="none" stroke="var(--brand-ink)" strokeWidth="15" strokeLinecap="butt" />
         <path d="M 44.03 134.97 A 66 66 0 0 1 42.84 67.00" fill="none" stroke="var(--brand-ink)" strokeWidth="19" strokeLinecap="butt" />
       </svg>
-      <div
-        style={{
-          font: 'var(--weight-semibold) var(--type-tile-title) / var(--leading-tight) var(--font-family)',
-          color: 'var(--brand-ink)',
-        }}
-      >
-        FCC Program Integrator
+      {/* Two-line wordmark, replacing the single "FCC Program Integrator"
+          line -- Coordinator direction, 27 Aug 2026, with a supplied
+          mockup: "Integrator" carries the value proposition (the
+          integration of risk and control management) and reads as the
+          dominant word, "FCC Program" as its smaller lead-in. Centered,
+          matching the mark above it. */}
+      <div style={{ textAlign: 'center' }}>
+        <div
+          style={{
+            font: 'var(--weight-semibold) var(--type-tile-title) / var(--leading-tight) var(--font-family)',
+            color: 'var(--brand-ink)',
+          }}
+        >
+          FCC Program
+        </div>
+        <div
+          style={{
+            // PROVISIONAL, not yet a token -- 40 canvas, one step above
+            // --type-tile-title (24) and, as it happens, the same value
+            // as --type-tile-hero, though deliberately not that token
+            // itself (same reasoning as --type-composition-label vs
+            // --type-body: same value, different job, and reusing the
+            // hero token would couple the wordmark to a live tile's own
+            // number changing size for unrelated reasons).
+            font: 'var(--weight-semibold) 40px / var(--leading-tight) var(--font-family)',
+            color: 'var(--brand-ink)',
+          }}
+        >
+          Integrator
+        </div>
       </div>
     </div>
   );

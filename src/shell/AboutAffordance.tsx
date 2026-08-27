@@ -10,7 +10,12 @@ export function AboutAffordance(): JSX.Element {
         onClick={() => setOpen(true)}
         aria-haspopup="dialog"
         style={{
-          font: 'var(--weight-medium) var(--type-legend) / var(--leading-tight) var(--font-family)',
+          // PROVISIONAL, not yet a token -- 24 canvas, up from
+          // --type-legend (16). Coordinator direction, 27 Aug 2026:
+          // "closer in size to Month/Quarter/Year," and positioned near
+          // the bottom of the panel (NavigationFrame.tsx's marginTop:
+          // auto wrapper), filling space that used to sit empty.
+          font: 'var(--weight-medium) 24px / var(--leading-tight) var(--font-family)',
           color: 'var(--accent)',
           background: 'transparent',
           border: 'none',

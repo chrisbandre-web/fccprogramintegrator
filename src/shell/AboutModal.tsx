@@ -83,6 +83,7 @@ export function AboutModal({ open, onClose }: { open: boolean; onClose: () => vo
         aria-modal="true"
         aria-label={ABOUT_HEADING}
         tabIndex={-1}
+        className="about-modal-scroll"
         style={{
           // transform: scale(max(var(--canvas-scale), FLOOR)) — a floor,
           // not a straight multiplier. Confirmed 28 Aug 2026 (Coordinator,
@@ -112,7 +113,6 @@ export function AboutModal({ open, onClose }: { open: boolean; onClose: () => vo
           padding: 'var(--space-6)',
           maxWidth: 720,
           maxHeight: '80vh',
-          overflowY: 'auto',
           font: 'var(--weight-regular) var(--type-body) / var(--leading-body) var(--font-family)',
           color: 'var(--ink-primary)',
           outline: 'none',

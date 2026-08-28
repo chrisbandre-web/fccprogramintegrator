@@ -327,3 +327,31 @@ select:focus-visible,
   outline: var(--focus-ring);
   outline-offset: var(--focus-ring-offset);
 }
+
+/* Persistent, non-overlay scrollbar for the About modal's scrollable
+   region — Art Director note, 28 Aug 2026. Mouse-scroll and the Close
+   button both work, but an overlay scrollbar (invisible until actively
+   scrolling — the default on WebKit/macOS) gives no visual signal that
+   there's more content below; a viewer who can't see that reads
+   truncation as the end of the sentence, and the last paragraph is a
+   definition-of-done item (names the synthetic data and the scaled
+   population). overflow-y: scroll (not auto) plus explicit,
+   non-transparent track/thumb styling for both rendering engines —
+   Firefox's scrollbar-width/-color, WebKit's ::-webkit-scrollbar — keeps
+   the scrollbar visible at all times, not just during interaction. */
+.about-modal-scroll {
+  overflow-y: scroll;
+  scrollbar-width: auto;
+  scrollbar-color: var(--ink-tertiary) var(--surface-edge);
+}
+.about-modal-scroll::-webkit-scrollbar {
+  width: var(--space-2);
+}
+.about-modal-scroll::-webkit-scrollbar-track {
+  background: var(--surface-edge);
+}
+.about-modal-scroll::-webkit-scrollbar-thumb {
+  background: var(--ink-tertiary);
+  border-radius: 4px;
+  border: 2px solid var(--surface-edge);
+}

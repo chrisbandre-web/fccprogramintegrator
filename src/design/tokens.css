@@ -1,6 +1,6 @@
 /* =============================================================================
    FCC Program Integrator — Design System tokens
-   Touch Two · v1.4 · amended 27 August 2026 · Art Director / Design System owner
+   Touch Two · v1.5 · amended 28 August 2026 · Art Director / Design System owner
 
    THE ONE TOKEN FILE. Every value the build uses lives here. No component
    hardcodes a value this file defines. Role names are the vocabulary the
@@ -95,12 +95,27 @@
      doing structural work; the Records carries its quietest step on one cell.
      --------------------------------------------------------------------------- */
 
-  /* AMENDMENT 1 (23 Aug 2026): cool -> warm -> hot escalation, not a single hue.
-     The prior single-hue ramp read as shades of one colour rather than as a risk
-     scale, and its Low sat at 1.18:1 against the ground — invisible, so a
-     low-risk book read as a truncated bar rather than as a full quiet one. */
+  /* v1.5 (28 Aug 2026) — COORDINATOR CLARIFICATION of the frozen Inception Form.
+     The Form fixes this scale as a three-level ordinal and says it is "not a
+     RAG". The intended meaning is NOT AS VIBRANT: the Board carries traditional
+     RAG at full strength; the module carries the same intelligible risk levels
+     at lower saturation, so a more granular decomposition is met with
+     correspondingly quieter colour. It was never a prohibition on the RAG hues.
+     Touch One's reading — that no green may appear in encoding 4 — was an
+     inference, not an instruction, and AMENDMENT 1's cool-to-hot ramp followed
+     from that inference. Both are SUPERSEDED. Do not re-derive them.
 
-  --risk-bar-low:      #B4BCC0;   /* cool slate   · 1.74:1 on ground */
+     The ramp is now green -> ochre -> oxblood: the same colour language as the
+     Board, met a second time at lower volume. Rule D is what keeps them
+     distinct, and it holds by lightness: the Board's --status-green is at
+     lightness 0.32, this is at 0.69, and the two never co-occur on a surface.
+
+     Amendment 1's original defect fix still stands and must not regress: Low
+     must remain clearly distinguishable from the ground, or a low-risk book
+     reads as a truncated bar rather than as a full quiet one. */
+
+  --risk-bar-low:      #AAC0A2;   /* pale sage  · 1.76:1 on ground · 1.68 vs medium
+                                     · --ink-primary label 8.93:1               */
   --risk-bar-medium:   #C08040;   /* ochre        · 2.95:1 on ground */
   --risk-bar-high:     #8C2F20;   /* deep oxblood · 7.44:1 on ground */
   /* Segment labels (Rule E — required, see Amendment 1 §3):
@@ -108,7 +123,7 @@
        on medium use --ink-primary (5.31:1)
        on high   use --surface     (7.84:1)  <- light on dark */
 
-  --risk-text-low:     #57626A;   /* 5.94:1 on surface */
+  --risk-text-low:     #4A5C42;   /* 6.88:1 on surface — v1.5, same family as the bar */
   --risk-text-medium:  #7E5416;   /* 6.30:1 on surface */
   --risk-text-high:    #8C2F20;   /* 7.84:1 on surface */
   /* Text tint, not a cell wash: the Rating column sits mid-table and a wash

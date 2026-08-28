@@ -15,17 +15,29 @@ const LINES: readonly { id: BusinessLine; label: string }[] = [
   { id: 'asset-management', label: 'Asset Management' },
 ];
 
-// "Book" only, now — Coordinator direction, 27 Aug 2026: no separate
-// "Recent intake" caption any more (the pill row above that bar already
-// names the line and doubles as its header — a second, redundant label
-// would repeat what the pills already say). Book still needs a plain
-// label; it has no pills of its own to speak for it. Bumped to 18px to
-// match the pill row's own size (--type-composition-label), per the same
-// direction.
-function BookCaption(): JSX.Element {
+// Revised again 28 Aug 2026 (Art Director note): a plain text caption on
+// EVERY row, always — "Recent intake" above the upper bar, "Book" above
+// the lower, on all four groups including Whole Book. The prior version
+// let the pill row's line-name pill stand in as the "header" for recent
+// intake and skipped a separate caption for it, on the reasoning that a
+// second label would just repeat the line name. That reasoning solved
+// the wrong problem: the pill's line name answers "which LINE", not
+// "which of the two rows" — recent intake vs. book are two different
+// facts, and only one of them (book) was actually being named. Worse for
+// Whole Book specifically: since both its rows are interactive, both
+// rendered a "Whole Book" pill, so the same name appeared twice with two
+// different, seemingly contradictory sets of numbers. Signature moment
+// two's entire argument is that recent intake differs from the
+// established book — that comparison doesn't read if the two terms
+// aren't both named. Whole Book's book row keeps its pills (still
+// selectable, per the Coordinator's ruling that both of its rows stay
+// interactive) but now captions them "Book" like every other line's
+// book row, not "Whole Book" again — the caption was what was missing,
+// not the interaction.
+function RowCaption({ children }: { children: string }): JSX.Element {
   return (
     <span style={{ font: 'var(--weight-regular) 18px / var(--leading-tight) var(--font-family)', color: 'var(--ink-tertiary)' }}>
-      Book
+      {children}
     </span>
   );
 }
@@ -38,14 +50,11 @@ function BookCaption(): JSX.Element {
  * handler at all any more (§D.6.6). This component now only lays bars
  * and pill rows out; it owns no interaction directly.
  *
- * Revised again 27 Aug 2026 (Coordinator direction, feasibility discussed
+ * Revised 27 Aug 2026 (Coordinator direction, feasibility discussed
  * first): recent intake now renders ABOVE book, not below — recent to
  * historical, and it means the row that survives collapse (recent
  * intake) is already the one sitting first when expanded, rather than
- * swapping position on collapse. The pill row above it is deliberately
- * the section's only header — "each section starts with a pill line
- * declaring what that section represents" — not a separate title, which
- * would just repeat the line name the line-name pill already carries.
+ * swapping position on collapse.
  *
  * Whole Book keeps both rows interactive (its own two pill rows, book
  * and recent intake) per the Coordinator's ruling — both currently
@@ -53,9 +62,9 @@ function BookCaption(): JSX.Element {
  * same population query (§D.6.4's bookComposition is horizon-independent
  * either way this is reached), preserving the pre-existing, documented
  * Whole Book asymmetry rather than resolving it. A business line's Book
- * row is display-only: no pills, no interaction — its Records query was
- * always population 'intake' at the current horizon regardless of which
- * of its two bars was clicked (baseQueryFor, selectors.ts), so a second,
+ * row has a caption but no pills — its Records query was always
+ * population 'intake' at the current horizon regardless of which of its
+ * two bars was clicked (baseQueryFor, selectors.ts), so a second,
  * always-redundant interactive row would have been a control that never
  * did anything different from its neighbour.
  */
@@ -74,7 +83,7 @@ function ComparisonGroup({
   book: Composition | null; // null when collapsed — the book row drops out (§D.6.5's Implementation Note)
   recent: Composition;
   selected: boolean;
-  interactiveBook: boolean; // true only for Whole Book — a line's Book row is display-only
+  interactiveBook: boolean; // true only for Whole Book — a line's Book row has a caption, no pills
   state: KycState;
   dispatch: (action: KycAction) => void;
 }): JSX.Element {
@@ -87,15 +96,15 @@ function ComparisonGroup({
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+          <RowCaption>Recent intake</RowCaption>
           <SegmentPills groupLabel={groupLabel} line={line} composition={recent} state={state} dispatch={dispatch} />
           <CompositionBar composition={recent} />
         </div>
         {book && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
-            {interactiveBook ? (
+            <RowCaption>Book</RowCaption>
+            {interactiveBook && (
               <SegmentPills groupLabel={groupLabel} line={line} composition={book} state={state} dispatch={dispatch} />
-            ) : (
-              <BookCaption />
             )}
             <CompositionBar composition={book} />
           </div>

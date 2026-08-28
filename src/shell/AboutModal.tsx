@@ -84,6 +84,26 @@ export function AboutModal({ open, onClose }: { open: boolean; onClose: () => vo
         aria-label={ABOUT_HEADING}
         tabIndex={-1}
         style={{
+          // transform: scale(var(--canvas-scale)) — this dialog is
+          // portalled to document.body, deliberately outside .canvas-root
+          // (canvas.css), so none of the rest of the app's uniform
+          // shrink-to-viewport treatment applies to it for free. Every
+          // other px value in this app is a CANVAS unit, made
+          // proportionally correct only because it lives inside
+          // .canvas-root's own transform: scale(). This dialog's
+          // maxWidth/padding/font sizes are real, unscaled browser
+          // pixels, so at any canvas-scale below 1 (any real viewport
+          // narrower than 1920), the dialog looks disproportionately
+          // large against the shrunk canvas behind it — at a small
+          // enough viewport, large enough to read as "full screen" with
+          // no visible backdrop margin. Found live, 28 Aug 2026
+          // (Coordinator) — not a regression in this file (one commit
+          // total, unchanged since it was built), but a real gap: the
+          // only element in the whole app not subject to the scaling
+          // system everything else relies on for consistent proportions.
+          // Same mechanism as .canvas-root itself (canvas.css), applied
+          // here instead of recalculating every dimension by hand.
+          transform: 'scale(var(--canvas-scale, 1))',
           background: 'var(--surface)',
           border: '1px solid var(--surface-edge)',
           borderRadius: 8,

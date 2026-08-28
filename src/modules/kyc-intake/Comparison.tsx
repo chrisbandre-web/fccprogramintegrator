@@ -115,26 +115,24 @@ function ComparisonGroup({
 // merely its size — a content transition, not a CSS one (§D.6.5's
 // Implementation Note).
 //
-// justify-content: space-between on the groups wrapper (added 27 Aug
-// 2026, Coordinator direction), not a hardcoded gap — deliberately.
-// C1's UAT note and this component's own unused vertical space are the
-// same fact: at full height, four sections' worth of fixed content
-// (computed: ~456 canvas across Whole Book's two-pill-row structure and
-// three symmetric line sections) leaves roughly 448 canvas of real
-// slack in a 1016-canvas-tall module area, once Comparison's own
-// padding, its gap before MethodologyLabel, and MethodologyLabel's own
-// two lines are accounted for — about 149 canvas per boundary, worked
-// from the canvas's known fixed dimensions rather than guessed. A
-// hardcoded 149px would be correct only for exactly this combination of
-// font sizes and padding, and would silently drift the next time any of
-// those change; space-between recomputes the same answer automatically,
-// which is why it's used here instead of the number itself. Requires
-// the wrapper to actually stretch to fill its share of the available
-// height (flex: 1 below, plus height: 100% on this component's own
-// root) — without that, flexbox has no slack to distribute and
-// space-between does nothing, which was the actual mechanism behind
-// C1's "lots of padding at the bottom": this content never stretched to
-// fill the height its parent had already allocated to it.
+// justify-content: center on the groups wrapper (revised 27 Aug 2026,
+// Coordinator direction, replacing the space-between tried a commit
+// earlier), with a fixed --space-4 gap between sections rather than a
+// computed one. space-between put ALL available slack into the
+// inter-section gaps, which is wrong in both directions at once: too
+// spread out in the expanded view (Coordinator's "more centered... push
+// all four sections closer together"), and too little breathing room
+// left in the collapsed view (~30% module height, far less slack to
+// begin with — "a little on the cramped side"). center packs the four
+// sections together at a modest, constant gap and puts whatever's left
+// over as symmetric padding above and below the whole group instead of
+// stretching it between items — which is the literal ask ("padding top
+// and bottom to push all four sections closer together") and, as a
+// side effect, is the safer choice for the collapsed state too:
+// --space-4 is the same gap this layout used successfully before
+// today's changes, so there's no new overflow risk in the tighter
+// 30%-height case the way a freshly computed larger gap would have
+// carried.
 export function Comparison({
   state,
   dispatch,
@@ -154,7 +152,7 @@ export function Comparison({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-4)', padding: 'var(--space-4)', height: '100%', boxSizing: 'border-box' }}>
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', flex: 1 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 'var(--space-4)', flex: 1 }}>
         <ComparisonGroup
           groupLabel="Whole Book"
           line="book"

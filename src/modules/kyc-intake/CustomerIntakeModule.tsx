@@ -40,7 +40,24 @@ export function CustomerIntakeModule(): JSX.Element {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div style={{ flex: state.selectedLine === null ? '1 1 auto' : '0 0 30%', minHeight: 0 }}>
+      {/* overflow: auto here, not just minHeight: 0 — same trap, same
+          fix pattern as RecordsPanel's own content div, but this one
+          wasn't caught until now: the 30% collapsed allocation was
+          already tight before captions came back (§D.6.5's 28 Aug
+          revision), and with them it's genuinely short by a real,
+          computed ~203 canvas (four rows at ~81 canvas each, the
+          fixed 30.48% of a 1016-canvas module height can't hold that
+          plus Comparison's own padding and MethodologyLabel). Without
+          this, that overflow doesn't get clipped or scrolled — it
+          spills straight into RecordsPanel's own content below it,
+          which is exactly what UAT caught: a genuine visual collision,
+          not a cosmetic gap. minHeight: 0 alone (already here) isn't
+          sufficient by itself, same lesson as the RecordsPanel fix —
+          it only stops this wrapper from refusing to shrink; it
+          doesn't contain content that's taller than the space it
+          shrank to. Found live, 28 Aug 2026 (Coordinator, taking
+          marketing screenshots). */}
+      <div style={{ flex: state.selectedLine === null ? '1 1 auto' : '0 0 30%', minHeight: 0, overflow: 'auto' }} tabIndex={-1}>
         <Comparison state={state} dispatch={dispatch} alignment={customerIntakeAlignment} />
       </div>
       {state.selectedLine !== null && (

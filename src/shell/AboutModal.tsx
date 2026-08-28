@@ -84,26 +84,28 @@ export function AboutModal({ open, onClose }: { open: boolean; onClose: () => vo
         aria-label={ABOUT_HEADING}
         tabIndex={-1}
         style={{
-          // transform: scale(var(--canvas-scale)) — this dialog is
-          // portalled to document.body, deliberately outside .canvas-root
-          // (canvas.css), so none of the rest of the app's uniform
-          // shrink-to-viewport treatment applies to it for free. Every
-          // other px value in this app is a CANVAS unit, made
-          // proportionally correct only because it lives inside
-          // .canvas-root's own transform: scale(). This dialog's
-          // maxWidth/padding/font sizes are real, unscaled browser
-          // pixels, so at any canvas-scale below 1 (any real viewport
-          // narrower than 1920), the dialog looks disproportionately
-          // large against the shrunk canvas behind it — at a small
-          // enough viewport, large enough to read as "full screen" with
-          // no visible backdrop margin. Found live, 28 Aug 2026
-          // (Coordinator) — not a regression in this file (one commit
-          // total, unchanged since it was built), but a real gap: the
-          // only element in the whole app not subject to the scaling
-          // system everything else relies on for consistent proportions.
-          // Same mechanism as .canvas-root itself (canvas.css), applied
-          // here instead of recalculating every dimension by hand.
-          transform: 'scale(var(--canvas-scale, 1))',
+          // transform: scale(max(var(--canvas-scale), FLOOR)) — a floor,
+          // not a straight multiplier. Confirmed 28 Aug 2026 (Coordinator,
+          // Samsung Note 10+): a real mobile canvas-scale is small enough
+          // (~0.21 at a 412px-wide viewport) that the modal's body text
+          // would render at roughly 4px following canvas-scale exactly --
+          // a genuine readability failure, not a preference. There's no
+          // requirement forcing this dialog to track canvas-scale 1:1;
+          // it's already the one architecturally distinct overlay in the
+          // build (the sole focus trap, §D.5.12), and nothing else needs
+          // to visually align WITH it the way elements within the
+          // dashboard need to align with each other. 0.4 is chosen to
+          // land close to the requested "roughly double" at that specific
+          // device's real scale (0.2146 -> 0.4292 would be exact double;
+          // 0.4 is a clean, slightly more conservative round number) --
+          // a genuine judgement call, not a measured optimum, since I
+          // have no way to see this rendered myself. A floor rather than
+          // a flat 2x multiplier specifically because it's self-limiting:
+          // inert at any canvas-scale already at or above 0.4 (ordinary
+          // desktop use), so it can't accidentally oversize the modal on
+          // a normal browser window the way a multiplier applied
+          // unconditionally could.
+          transform: 'scale(max(var(--canvas-scale, 1), 0.4))',
           background: 'var(--surface)',
           border: '1px solid var(--surface-edge)',
           borderRadius: 8,

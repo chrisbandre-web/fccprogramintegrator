@@ -40,11 +40,21 @@ export function CustomerIntakeModule(): JSX.Element {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <div style={{ flex: state.selectedLine === null ? '1 1 auto' : '0 0 30%' }}>
+      <div style={{ flex: state.selectedLine === null ? '1 1 auto' : '0 0 30%', minHeight: 0 }}>
         <Comparison state={state} dispatch={dispatch} alignment={customerIntakeAlignment} />
       </div>
       {state.selectedLine !== null && (
-        <div style={{ flex: '1 1 70%', borderTop: '1px solid var(--surface-edge)' }}>
+        // minHeight: 0, same reason as RecordsPanel.tsx's own content
+        // div: without it, this flex child refuses to shrink below its
+        // content's full height (the classic flex min-height: auto
+        // trap), so overflow: auto one level down never gets anything
+        // to actually do — content overflows THIS element's boundary
+        // instead and gets clipped by the canvas's own fixed edge,
+        // nowhere near a scrollable region. Fixed alongside
+        // RecordsPanel.tsx's own fix, 27 Aug 2026, second pass at UAT
+        // C4 — the first fix (overflow: hidden -> auto) was necessary
+        // but not sufficient on its own.
+        <div style={{ flex: '1 1 70%', minHeight: 0, borderTop: '1px solid var(--surface-edge)' }}>
           <RecordsPanel state={state} dispatch={dispatch} selectedLine={state.selectedLine} />
         </div>
       )}

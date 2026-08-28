@@ -94,8 +94,21 @@ export function RecordsPanel({
           (21 of 40) than what was showing (11 rows). 'hidden' discards
           the overflow instead of making it reachable; 'auto' (mouse/
           trackpad-scrollable, keyboard-inert via tabIndex) fixes the
-          real defect without reopening the tab-order question. */}
-      <div style={{ flex: 1, overflow: 'auto', padding: 'var(--space-4)' }} tabIndex={-1}>
+          real defect without reopening the tab-order question.
+
+          minHeight: 0 was still missing after that first fix, and UAT
+          confirmed the cut-off persisted (27 Aug 2026, second pass) --
+          the classic flexbox trap: a flex child's default min-height is
+          auto, which means it refuses to shrink below its OWN content's
+          height even inside a flex:1 parent. Without this, the div grows
+          to fit the full table instead of being constrained to its
+          allotted space, so overflow: auto never had anything to do —
+          the content just pushed past this element's boundary and got
+          clipped by whatever ancestor happened to have no scroll
+          mechanism of its own (the fixed-size canvas), nowhere near this
+          div's own edge. Same trap exists one level up the tree; see
+          CustomerIntakeModule.tsx's matching fix. */}
+      <div style={{ flex: 1, minHeight: 0, overflow: 'auto', padding: 'var(--space-4)' }} tabIndex={-1}>
         {page.total === 0 ? (
           <p style={{ color: 'var(--ink-tertiary)', font: 'var(--weight-regular) var(--type-body) / var(--leading-body) var(--font-family)' }}>
             No {state.rating === 'All' ? '' : `${state.rating}-rated `}records for {lineLabel} at this horizon.
